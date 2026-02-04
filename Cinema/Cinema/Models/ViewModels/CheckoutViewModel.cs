@@ -18,6 +18,7 @@ namespace Cinema.Models.ViewModels
         
         // Step 3: Snacks
         public List<SnackSelectionViewModel> Snacks { get; set; } = new List<SnackSelectionViewModel>();
+        public List<SnackSelectionViewModel> SelectedSnacks { get; set; } = new List<SnackSelectionViewModel>();
         
         public decimal TotalPrice { get; set; }
     }

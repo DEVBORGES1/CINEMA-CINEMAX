@@ -1,0 +1,64 @@
+@model Cinema.Models.Order
+@{
+    ViewData["Title"] = "Pedido Confirmado!";
+}
+
+<div class="container py-5 text-center">
+    <div class="card bg-dark text-white border-secondary shadow-lg mx-auto" style="max-width: 600px;">
+        <div class="card-body p-5">
+            <div class="mb-4 text-success">
+                <i class="fas fa-check-circle fa-5x animate-pulse"></i>
+            </div>
+            
+            <h2 class="fw-bold mb-3">Pagamento Aprovado!</h2>
+            <p class="text-white-50 mb-5">Seu pedido #@Model.ID foi processado com sucesso. Enviamos os detalhes para seu e-mail.</p>
+
+            <div class="bg-black bg-opacity-25 p-4 rounded border border-secondary mb-5 text-start">
+                <h5 class="fw-bold border-bottom border-secondary pb-2 mb-3">Detalhes</h5>
+                
+                @if(Model.Tickets.Any())
+                {
+                    var firstTicket = Model.Tickets.First();
+                    <div class="mb-3">
+                        <strong class="d-block text-warning me-2"><i class="fas fa-film me-2"></i>@firstTicket.Session?.Movie?.Title</strong>
+                        <small class="text-white-50 d-block mb-1">@firstTicket.Session?.StartTime.ToString("dd/MM/yyyy HH:mm")</small>
+                        <small class="text-white-50">Sala @firstTicket.Session?.Room?.RoomNumber - Assentos: @string.Join(", ", Model.Tickets.Select(t => t.SeatRow + t.SeatNumber))</small>
+                    </div>
+                }
+
+                @if (Model.Snacks.Any())
+                {
+                    <div class="border-top border-secondary pt-3 mt-3">
+                        <strong class="d-block text-warning mb-2"><i class="fas fa-utensils me-2"></i>Itens da Bombonière</strong>
+                        <ul class="list-unstyled text-white-50 small mb-0">
+                            @foreach(var item in Model.Snacks)
+                            {
+                                <li>@item.Quantity x @item.Snack?.Name</li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+
+            <div class="d-grid gap-2">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary fw-bold rounded-pill">
+                    <i class="fas fa-home me-2"></i>Voltar ao Início
+                </a>
+                <a href="#" class="btn btn-outline-light rounded-pill" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>Imprimir Comprovante
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .animate-pulse {
+        animation: pulse 2s infinite;
+    }
+    @@keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>

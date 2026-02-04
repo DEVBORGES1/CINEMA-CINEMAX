@@ -35,7 +35,7 @@
                                     </div>
                                     <p class="lead text-white mb-4 text-shadow-sm d-none d-md-block">@movie.Synopsis</p>
                                     <div class="d-flex gap-3">
-                                         <a href="#schedule" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow-lg">
+                                         <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.ID" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow-lg">
                                             <i class="fas fa-ticket-alt me-2"></i>Ver Sessões
                                         </a>
                                         <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.ID" class="btn btn-outline-light btn-lg px-5 rounded-pill fw-bold backdrop-blur">
@@ -185,7 +185,7 @@
                                     
                                     <div class="mt-auto">
                                         <a asp-controller="Movie" asp-action="Details" asp-route-id="@item.Movie.ID" class="btn btn-warning w-100 fw-bold shadow-sm">
-                                            <i class="fas fa-ticket-alt me-2"></i>Garanta seu Ingresso
+                                            <i class="fas fa-ticket-alt me-2"></i>Ver Sessões
                                         </a>
                                     </div>
                                 </div>

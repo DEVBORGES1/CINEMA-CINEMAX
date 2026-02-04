@@ -96,6 +96,77 @@ namespace Cinema.Data
                     });
                 }
 
+                // Filme 4: Fight Club
+                if (drama != null)
+                {
+                    movies.Add(new Movie
+                    {
+                        Title = "Clube da Luta",
+                        Synopsis = "Um funcionário de escritório insone e um fabricante de sabão formam um clube de luta clandestino que evolui para algo muito mais.",
+                        DurationInMinutes = 139,
+                        ImageURL = "/uploads/Fight-Club.jpg",
+                        AgeRating = context.Set<AgeRating>().FirstOrDefault(r => r.Rating == "18"),
+                        Genres = new List<Genre> { drama }
+                    });
+                }
+
+                // Filme 5: Mad Max
+                if (action != null && scifi != null)
+                {
+                    movies.Add(new Movie
+                    {
+                        Title = "Mad Max: Estrada da Fúria",
+                        Synopsis = "Em um mundo pós-apocalíptico, Max se une a Furiosa para escapar de um tirano e sua armada em uma guerra pela sobrevivência.",
+                        DurationInMinutes = 120,
+                        ImageURL = "/uploads/MadMax.jpg",
+                        AgeRating = context.Set<AgeRating>().FirstOrDefault(r => r.Rating == "16"),
+                        Genres = new List<Genre> { action, scifi }
+                    });
+                }
+
+                // Filme 6: Rambo
+                if (action != null)
+                {
+                    movies.Add(new Movie
+                    {
+                        Title = "Rambo: Programado Para Matar",
+                        Synopsis = "Um veterano de guerra é perseguido por um xerife local, desencadeando uma batalha de sobrevivência nas montanhas.",
+                        DurationInMinutes = 93,
+                        ImageURL = "/uploads/Rambo-First-Blood.jpg",
+                        AgeRating = context.Set<AgeRating>().FirstOrDefault(r => r.Rating == "16"),
+                        Genres = new List<Genre> { action }
+                    });
+                }
+
+                // Filme 7: John Wick
+                if (action != null)
+                {
+                    movies.Add(new Movie
+                    {
+                        Title = "John Wick: De Volta ao Jogo",
+                        Synopsis = "Um ex-assassino sai da aposentadoria para rastrear os gângsters que mataram seu cachorro e roubaram seu carro.",
+                        DurationInMinutes = 101,
+                        ImageURL = "/uploads/john-wick.jpg",
+                        AgeRating = context.Set<AgeRating>().FirstOrDefault(r => r.Rating == "16"),
+                        Genres = new List<Genre> { action }
+                    });
+                }
+
+                // Filme 8: Watchmen
+                var suspense = context.Genres.FirstOrDefault(g => g.Name == "Suspense");
+                if (action != null && suspense != null)
+                {
+                    movies.Add(new Movie
+                    {
+                        Title = "Watchmen: O Filme",
+                        Synopsis = "Em uma realidade alternativa dos anos 80, super-heróis aposentados investigam o assassinato de um deles enquanto descobrem uma conspiração mortal.",
+                        DurationInMinutes = 162,
+                        ImageURL = "/uploads/watchmen.jpg",
+                        AgeRating = context.Set<AgeRating>().FirstOrDefault(r => r.Rating == "16"),
+                        Genres = new List<Genre> { action, suspense }
+                    });
+                }
+                
                 context.Movies.AddRange(movies);
                 context.SaveChanges();
             }
@@ -210,25 +281,63 @@ namespace Cinema.Data
 
                 if (movie1 != null && room1 != null)
                 {
-                    // Hoje
-                    context.Sessions.Add(new Session { Movie = movie1, Room = room1, StartTime = DateTime.Now.Date.AddHours(14), Price = 25.00m });
-                    context.Sessions.Add(new Session { Movie = movie1, Room = room1, StartTime = DateTime.Now.Date.AddHours(18), Price = 28.00m });
-                    // Amanhã
-                    context.Sessions.Add(new Session { Movie = movie1, Room = room1, StartTime = DateTime.Now.Date.AddDays(1).AddHours(20), Price = 30.00m });
+                    // Sessões futuras (a partir de agora)
+                    context.Sessions.Add(new Session { Movie = movie1, Room = room1, StartTime = DateTime.Now.AddHours(1), Price = 25.00m });
+                    context.Sessions.Add(new Session { Movie = movie1, Room = room1, StartTime = DateTime.Now.AddHours(4), Price = 28.00m });
+                    context.Sessions.Add(new Session { Movie = movie1, Room = room1, StartTime = DateTime.Now.AddDays(1).AddHours(2), Price = 30.00m });
                 }
 
                 if (movie2 != null && room2 != null)
                 {
-                    // Hoje
-                    context.Sessions.Add(new Session { Movie = movie2, Room = room2, StartTime = DateTime.Now.Date.AddHours(15), Price = 25.00m });
-                    // Amanhã
-                    context.Sessions.Add(new Session { Movie = movie2, Room = room2, StartTime = DateTime.Now.Date.AddDays(1).AddHours(15), Price = 25.00m });
+                    context.Sessions.Add(new Session { Movie = movie2, Room = room2, StartTime = DateTime.Now.AddHours(2), Price = 25.00m });
+                    context.Sessions.Add(new Session { Movie = movie2, Room = room2, StartTime = DateTime.Now.AddDays(1).AddHours(3), Price = 25.00m });
                 }
 
                  if (movie3 != null && room1 != null)
                 {
-                    // Hoje
-                    context.Sessions.Add(new Session { Movie = movie3, Room = room1, StartTime = DateTime.Now.Date.AddHours(21), Price = 35.00m });
+                    context.Sessions.Add(new Session { Movie = movie3, Room = room1, StartTime = DateTime.Now.AddHours(6), Price = 35.00m });
+                }
+
+                // Novos filmes com imagens locais
+                var fightClub = context.Movies.FirstOrDefault(m => m.Title == "Clube da Luta");
+                var madMax = context.Movies.FirstOrDefault(m => m.Title == "Mad Max: Estrada da Fúria");
+                var rambo = context.Movies.FirstOrDefault(m => m.Title == "Rambo: Programado Para Matar");
+                var johnWick = context.Movies.FirstOrDefault(m => m.Title == "John Wick: De Volta ao Jogo");
+                var watchmen = context.Movies.FirstOrDefault(m => m.Title == "Watchmen: O Filme");
+                
+                var room3 = context.Rooms.FirstOrDefault(r => r.RoomNumber == 3);
+                var room4 = context.Rooms.FirstOrDefault(r => r.RoomNumber == 4);
+
+                if (fightClub != null && room2 != null)
+                {
+                    context.Sessions.Add(new Session { Movie = fightClub, Room = room2, StartTime = DateTime.Now.AddHours(3), Price = 30.00m });
+                    context.Sessions.Add(new Session { Movie = fightClub, Room = room2, StartTime = DateTime.Now.AddDays(1).AddHours(5), Price = 32.00m });
+                }
+
+                if (madMax != null && room3 != null)
+                {
+                    context.Sessions.Add(new Session { Movie = madMax, Room = room3, StartTime = DateTime.Now.AddMinutes(30), Price = 28.00m });
+                    context.Sessions.Add(new Session { Movie = madMax, Room = room3, StartTime = DateTime.Now.AddHours(5), Price = 30.00m });
+                    context.Sessions.Add(new Session { Movie = madMax, Room = room3, StartTime = DateTime.Now.AddDays(1).AddHours(4), Price = 30.00m });
+                }
+
+                if (rambo != null && room1 != null)
+                {
+                    context.Sessions.Add(new Session { Movie = rambo, Room = room1, StartTime = DateTime.Now.AddHours(2.5), Price = 25.00m });
+                    context.Sessions.Add(new Session { Movie = rambo, Room = room1, StartTime = DateTime.Now.AddDays(1).AddHours(1), Price = 25.00m });
+                }
+
+                if (johnWick != null && room4 != null)
+                {
+                    context.Sessions.Add(new Session { Movie = johnWick, Room = room4, StartTime = DateTime.Now.AddMinutes(45), Price = 32.00m });
+                    context.Sessions.Add(new Session { Movie = johnWick, Room = room4, StartTime = DateTime.Now.AddHours(4.5), Price = 35.00m });
+                    context.Sessions.Add(new Session { Movie = johnWick, Room = room4, StartTime = DateTime.Now.AddDays(1).AddHours(6), Price = 35.00m });
+                }
+
+                if (watchmen != null && room2 != null)
+                {
+                    context.Sessions.Add(new Session { Movie = watchmen, Room = room2, StartTime = DateTime.Now.AddHours(7), Price = 30.00m });
+                    context.Sessions.Add(new Session { Movie = watchmen, Room = room2, StartTime = DateTime.Now.AddDays(1).AddHours(3.5), Price = 30.00m });
                 }
 
                 context.SaveChanges();
