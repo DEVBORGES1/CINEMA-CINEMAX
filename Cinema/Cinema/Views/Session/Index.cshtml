@@ -1,0 +1,111 @@
+@model IEnumerable<Cinema.Models.Session>
+
+@{
+    ViewData["Title"] = "Sessões";
+}
+
+<form id="deleteForm" asp-controller="Session" asp-action="Delete" method="post" style="display:none">
+    @Html.AntiForgeryToken()
+    <input id="deleteId" type="hidden" name="id" value="" />
+</form>
+
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold mb-3">
+                <i class="fas fa-clock text-warning me-3"></i>
+                Sessões Disponíveis
+            </h1>
+        </div>
+        <div class="text-center">
+            <a asp-controller="Session" asp-action="Create" class="btn btn-warning btn-lg">
+                Adicionar
+            </a>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            @foreach (var session in Model)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card session-card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">@session.Movie?.Title</h5>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <p class="card-text text-muted mb-1">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        @session.StartTime.ToString("dd/MM/yyyy")
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="card-text text-muted mb-3">
+                                <i class="fas fa-door-open me-1"></i>
+                                Sala @session.Room?.RoomNumber
+                            </p>
+                            <p class="card-text text-muted mb-3">
+                                <i class="fas fa-users me-1"></i>
+                                Capacidade: @session.Room?.Capacity lugares
+                            </p>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Horário:
+                                </h6>
+                                <p class="text-muted">@session.StartTime.ToString("HH:mm") - @session.EndTime.ToString("HH:mm")</p>
+                            </div>
+                            <div class="d-grid">
+                                <div class="mt-auto">
+                                    <div class="d-flex gap-2 flex-column flex-sm-row">
+                                        <a asp-action="Details" asp-route-id="@session.ID"
+                                           class="btn btn-warning">
+                                            <i class="fas fa-info-circle me-1"></i>Ver Detalhes
+                                        </a>
+                                        <a asp-controller="Ticket" asp-action="Buy" asp-route-sessionId="@session.ID"
+                                           class="btn btn-success flex-fill">
+                                            <i class="fas fa-ticket-alt me-1"></i>Comprar
+                                        </a>
+                                        <a asp-action="Update" asp-route-id="@session.ID"
+                                           class="btn btn-warning flex-fill">
+                                            <i class="fa-solid fa-pen me-1"></i>Editar
+                                        </a>
+                                        <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@session.ID" onclick="return confirm('Remover esta sessão?');">
+                                            <i class="fa-solid fa-trash me-1"></i>Excluir
+                                        </a>
+                                    </div>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-clock fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">Nenhuma sessão disponível</h4>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.delete-link').forEach(function (el) {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var id = this.dataset.id;
+                    if (!id) return;
+                    if (!confirm('Confirma exclusão desta sessão?')) return;
+                    var input = document.getElementById('deleteId');
+                    input.value = id;
+                    document.getElementById('deleteForm').submit();
+                });
+            });
+        });
+    </script>
+}

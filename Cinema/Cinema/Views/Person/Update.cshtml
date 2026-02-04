@@ -1,0 +1,163 @@
+﻿@model Cinema.Models.Person
+
+@{
+    ViewData["Title"] = "Pessoas";
+    var isClient = Model != null && Model.IsClient == true;
+    var roles = (IEnumerable<Cinema.Models.Role>?)ViewBag.RolesList ?? Enumerable.Empty<Cinema.Models.Role>();
+
+    string? cpfFormatted = null;
+    string? phoneFormatted = null;
+    if (!string.IsNullOrWhiteSpace(Model?.CPF))
+    {
+        var d = System.Text.RegularExpressions.Regex.Replace(Model.CPF!, "\\D", "");
+        if (d.Length == 11)
+            cpfFormatted = d.Substring(0, 3) + "." + d.Substring(3, 3) + "." + d.Substring(6, 3) + "-" + d.Substring(9, 2);
+        else
+            cpfFormatted = Model.CPF;
+    }
+    if (!string.IsNullOrWhiteSpace(Model?.PhoneNumber))
+    {
+        var d = System.Text.RegularExpressions.Regex.Replace(Model.PhoneNumber!, "\\D", "");
+        if (d.Length == 10)
+            phoneFormatted = $"({d.Substring(0,2)}) {d.Substring(2,4)}-{d.Substring(6)}";
+        else if (d.Length == 11)
+            phoneFormatted = $"({d.Substring(0,2)}) {d.Substring(2,5)}-{d.Substring(7)}";
+        else
+            phoneFormatted = Model.PhoneNumber;
+    }
+}
+
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold mb-3">
+                <i class="fas fa-user text-warning me-3"></i>
+                Editar Pessoa
+            </h1>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="mx-auto">
+        <form asp-action="Update" method="post"
+              id="personForm"
+              asp-route-personId="@Model.ID">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input asp-for="ID" type="hidden" />
+
+            <div class="form-group">
+                <label class="control-label">Primeiro Nome</label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Último Nome</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Data de Nascimento</label>
+                <input asp-for="BirthDate" class="form-control" type="text" id="BirthDate" placeholder="dd/mm/aaaa" maxlength="10" pattern="\d{2}\/\d{2}\/\d{4}" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Data de Cadastro</label>
+                <p class="form-control-plaintext">@((Model?.EnrollmentDate ?? DateOnly.FromDateTime(DateTime.Now)).ToString("dd/MM/yyyy"))</p>
+                <span asp-validation-for="EnrollmentDate" class="text-danger"></span>
+
+                <input type="hidden" id="EnrollmentDate" name="EnrollmentDate" value="@( (Model?.EnrollmentDate ?? DateOnly.FromDateTime(DateTime.Now)).ToString("yyyy-MM-dd") )" />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Papel (selecione um ou mais)</label>
+                <div>
+                    @foreach (var role in roles)
+                    {
+                        var isChecked = Model?.Roles?.Any(r => r.ID == role.ID) == true;
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input role-checkbox" type="checkbox" name="selectedRoles" value="@role.ID" id="role_@role.ID" data-name="@role.Name" @(isChecked ? "checked" : "") />
+                            <label class="form-check-label" for="role_@role.ID">@role.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Campos adicionais que aparecem apenas quando role == "Cliente" -->
+            <div id="clientFields" style="display:@(isClient ? "block" : "none"); margin-top:15px;">
+                <h4>Informações adicionais (Cliente)</h4>
+
+                <div class="form-group">
+                    <label>CPF</label>
+                    <!-- agora o value é preenchido com o CPF existente (formatado quando possível) -->
+                    <input type="tel" id="CPF" name="CPF" class="form-control" placeholder="000.000.000-00" maxlength="14" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" value="@(cpfFormatted ?? "")" />
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" id="Email" name="Email" class="form-control" placeholder="Email" value="@(Model?.Email ?? "")" />
+                </div>
+
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <!-- value preenchido com telefone existente (formatado quando possível) -->
+                    <input type="tel" id="PhoneNumber" name="PhoneNumber" class="form-control" placeholder="(00) 00000-0000" maxlength="15" pattern="\(\d{2}\) \d{4,5}-\d{4}" value="@(phoneFormatted ?? "")" />
+                </div>
+            </div>
+
+            <br />
+
+            <div class="form-group">
+                <input type="submit" value="Salvar" class="btn btn-warning btn-lg" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var clientFields = document.getElementById('clientFields');
+            var checkboxes = document.querySelectorAll('.role-checkbox');
+
+            function updateClientFields() {
+                if (!clientFields) return;
+                var hasCliente = Array.prototype.slice.call(checkboxes || []).some(function (cb) {
+                    var name = (cb.dataset && cb.dataset.name || '').trim().toLowerCase();
+                    return name === 'cliente' && cb.checked;
+                });
+                if (hasCliente) {
+                    clientFields.style.display = 'block';
+                } else {
+                    clientFields.style.display = 'none';
+                    Array.prototype.forEach.call(clientFields.querySelectorAll('input'), function (inp) {
+                        inp.value = '';
+                    });
+                }
+            }
+
+            Array.prototype.forEach.call(checkboxes, function (cb) {
+                cb.addEventListener('change', updateClientFields);
+            });
+
+            // refletir seleção inicial
+            updateClientFields();
+
+            var cpfEl = document.getElementById('CPF');
+            var phoneEl = document.getElementById('PhoneNumber');
+            function formatCPF(value) { if (!value) return ''; var v = value.replace(/\D/g, '').slice(0, 11); v = v.replace(/(\d{3})(\d)/, '$1.$2'); v = v.replace(/(\d{3})(\d)/, '$1.$2'); v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); return v; }
+            function formatPhone(value) { if (!value) return ''; var v = value.replace(/\D/g, '').slice(0, 11); if (v.length <= 10) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').trim(); else v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').trim(); v = v.replace(/-$/, ''); return v; }
+            function attachFormatting(el, formatter) { if (!el) return; el.addEventListener('input', function (e) { var start = el.selectionStart; var oldLen = el.value.length; el.value = formatter(el.value); var newLen = el.value.length; var diff = newLen - oldLen; try { el.setSelectionRange(start + diff, start + diff); } catch {} }); el.addEventListener('blur', function () { el.value = formatter(el.value); }); el.addEventListener('paste', function () { setTimeout(function () { el.value = formatter(el.value); }, 0); }); }
+            attachFormatting(cpfEl, formatCPF);
+            attachFormatting(phoneEl, formatPhone);
+            var form = document.getElementById('personForm');
+            if (form) {
+                form.addEventListener('submit', function () { /* opcional cleanup */ });
+            }
+        })();
+    </script>
+}

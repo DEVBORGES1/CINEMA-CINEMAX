@@ -1,0 +1,429 @@
+﻿@model Cinema.Models.ViewModels.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- Carousel Section -->
+@if (Model.FeaturedMovies.Any())
+{
+    <div id="heroCarousel" class="carousel slide hero-wrapper w-100" data-bs-ride="carousel" style="height: 85vh; margin-top: -4rem;">
+        <div class="carousel-indicators">
+            @for (int i = 0; i < Model.FeaturedMovies.Count; i++)
+            {
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")" aria-label="Slide @(i + 1)"></button>
+            }
+        </div>
+        <div class="carousel-inner h-100">
+            @for (int i = 0; i < Model.FeaturedMovies.Count; i++)
+            {
+                var movie = Model.FeaturedMovies[i];
+                <div class="carousel-item h-100 @(i == 0 ? "active" : "")">
+                    <div class="hero-bg" style="background-image: url('@movie.ImageURL');"></div>
+                    <div class="hero-overlay d-flex align-items-end pb-5">
+                        <div class="container pb-5">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <span class="badge bg-warning text-dark fw-bold mb-3 px-3 py-2 text-uppercase">Em Destaque</span>
+                                    <h1 class="display-1 fw-bold text-white mb-2 text-shadow-lg">@movie.Title</h1>
+                                    <div class="d-flex align-items-center gap-3 text-white-50 mb-4 fs-5">
+                                        <span><i class="fas fa-clock me-1"></i>@movie.DurationInMinutes min</span>
+                                        <span>|</span>
+                                        <span>@movie.AgeRating?.Rating</span>
+                                        <span>|</span>
+                                        <span>@string.Join(", ", movie.Genres.Select(g => g.Name))</span>
+                                    </div>
+                                    <p class="lead text-white mb-4 text-shadow-sm d-none d-md-block">@movie.Synopsis</p>
+                                    <div class="d-flex gap-3">
+                                         <a href="#schedule" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow-lg">
+                                            <i class="fas fa-ticket-alt me-2"></i>Ver Sessões
+                                        </a>
+                                        <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.ID" class="btn btn-outline-light btn-lg px-5 rounded-pill fw-bold backdrop-blur">
+                                            <i class="fas fa-info-circle me-2"></i>Detalhes
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Próximo</span>
+        </button>
+    </div>
+}
+
+<!-- Promotions Section -->
+<div class="container mt-5 pt-3">
+    <div class="row g-4 justify-content-center">
+        <!-- Promo 1: Semana do Cinema -->
+        <div class="col-md-4">
+            <div class="promo-card bg-dark border border-secondary rounded overflow-hidden shadow-lg h-100 position-relative">
+                <div class="promo-icon position-absolute top-0 end-0 p-3 text-warning opacity-25">
+                    <i class="fas fa-film fa-5x"></i>
+                </div>
+                <div class="card-body p-4 position-relative z-1">
+                    <span class="badge bg-danger mb-2">Imperdível</span>
+                    <h3 class="fw-bold text-white mb-2">Semana do Cinema</h3>
+                    <p class="text-white-50 mb-4">Ingressos com preço único para todos! Aproveite a melhor experiência por apenas R$ 10,00.</p>
+                    <a href="#schedule" class="btn btn-outline-warning w-100 fw-bold">Ver Programação</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Promo 2: Meia Entrada -->
+        <div class="col-md-4">
+            <div class="promo-card bg-dark border border-secondary rounded overflow-hidden shadow-lg h-100 position-relative">
+                <div class="promo-icon position-absolute top-0 end-0 p-3 text-primary opacity-25">
+                    <i class="fas fa-id-card fa-5x"></i>
+                </div>
+                <div class="card-body p-4 position-relative z-1">
+                    <span class="badge bg-primary mb-2">Benefício</span>
+                    <h3 class="fw-bold text-white mb-2">Meia Entrada</h3>
+                    <p class="text-white-50 mb-4">Estudantes, idosos e professores pagam meia todos os dias. Basta apresentar a carteirinha!</p>
+                    <button class="btn btn-outline-light w-100 fw-bold" disabled>Saiba Mais</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Promo 3: Pipoca -->
+        <div class="col-md-4">
+            <div class="promo-card bg-warning text-dark border-0 rounded overflow-hidden shadow-lg h-100 position-relative">
+                <div class="promo-icon position-absolute top-0 end-0 p-3 text-dark opacity-10">
+                    <i class="fas fa-popcorn fa-5x"></i>
+                </div>
+                <div class="card-body p-4 position-relative z-1">
+                    <span class="badge bg-dark text-warning mb-2">Snack Bar</span>
+                    <h3 class="fw-bold mb-2">Pipoca pela Metade</h3>
+                    <p class="mb-4">Na compra de 2 ingressos, o combo grande de pipoca sai com 50% de desconto. Aproveite!</p>
+                    <a href="#" class="btn btn-dark w-100 fw-bold">Ver Combos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content with Tabs -->
+<div id="schedule" class="container py-5 mt-5">
+    
+    <!-- Tab Navigation -->
+    <ul class="nav nav-pills mb-5 justify-content-center" id="homeTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold fs-4 px-5 rounded-pill" id="now-showing-tab" data-bs-toggle="pill" data-bs-target="#now-showing" type="button" role="tab" aria-controls="now-showing" aria-selected="true">
+                <i class="fas fa-play-circle me-2"></i>Em Cartaz
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold fs-4 px-5 rounded-pill" id="coming-soon-tab" data-bs-toggle="pill" data-bs-target="#coming-soon" type="button" role="tab" aria-controls="coming-soon" aria-selected="false">
+                <i class="fas fa-hourglass-half me-2"></i>Em Breve
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="homeTabsContent">
+        
+        <!-- Tab 1: Now Showing (Scheduler) -->
+        <div class="tab-pane fade show active" id="now-showing" role="tabpanel" aria-labelledby="now-showing-tab">
+            <div class="d-flex justify-content-between align-items-end mb-4 border-bottom border-secondary pb-3">
+                <h2 class="h4 text-uppercase border-start border-4 border-warning ps-3 mb-0 text-white">
+                    Programação Atual
+                </h2>
+                 <div class="text-white-50">
+                    Exibindo sessões para <strong>Hoje</strong> e <strong>Amanhã</strong>
+                </div>
+            </div>
+
+            @if (Model.NowShowing.Any())
+            {
+                <div class="horizontal-scroll-container d-flex overflow-auto gap-4 py-4 pb-5" style="scroll-behavior: smooth;">
+                    @foreach (var item in Model.NowShowing)
+                    {
+                        <div class="movie-card-wrapper" style="min-width: 250px; width: 250px;">
+                            <div class="card bg-dark border-0 h-100 shadow-lg movie-card-hover">
+                                <div class="position-relative overflow-hidden rounded-top">
+                                    <span class="badge bg-danger position-absolute top-0 start-0 m-2 z-2 shadow-sm">Em Cartaz</span>
+                                    
+                                    @if (!string.IsNullOrEmpty(item.Movie.ImageURL))
+                                    {
+                                        <img src="@item.Movie.ImageURL" class="card-img-top" alt="@item.Movie.Title" style="height: 380px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-secondary d-flex align-items-center justify-content-center text-white-50" style="height: 380px;">
+                                            <i class="fas fa-film fa-3x"></i>
+                                        </div>
+                                    }
+
+                                    <!-- Overlay with Quick Actions -->
+                                    <div class="overlay d-flex flex-column align-items-center justify-content-center gap-3">
+                                        <a asp-controller="Movie" asp-action="Details" asp-route-id="@item.Movie.ID" class="btn btn-outline-light rounded-pill fw-bold">
+                                            <i class="fas fa-info-circle me-2"></i>Detalhes
+                                        </a>
+                                        <!-- Optional: Open Sessions Modal or Link -->
+                                    </div>
+                                </div>
+
+                                <div class="card-body text-center d-flex flex-column">
+                                    <h5 class="card-title text-white fw-bold text-truncate mb-1">
+                                        <a asp-controller="Movie" asp-action="Details" asp-route-id="@item.Movie.ID" class="text-white text-decoration-none hover-warning">
+                                            @item.Movie.Title
+                                        </a>
+                                    </h5>
+                                    <div class="mb-3 text-white-50 small">
+                                        <span class="badge border border-secondary text-light me-1">@item.Movie.AgeRating?.Rating</span>
+                                        <span>@item.Movie.DurationInMinutes min</span>
+                                    </div>
+                                    <p class="card-text text-muted small text-truncate mb-3">@string.Join(", ", item.Movie.Genres.Select(g => g.Name))</p>
+                                    
+                                    <div class="mt-auto">
+                                        <a asp-controller="Movie" asp-action="Details" asp-route-id="@item.Movie.ID" class="btn btn-warning w-100 fw-bold shadow-sm">
+                                            <i class="fas fa-ticket-alt me-2"></i>Garanta seu Ingresso
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <h3 class="text-muted">Nenhuma sessão disponível no momento.</h3>
+                </div>
+            }
+        </div>
+
+        <!-- Tab 2: Coming Soon -->
+        <div class="tab-pane fade" id="coming-soon" role="tabpanel" aria-labelledby="coming-soon-tab">
+             <div class="mb-4 border-bottom border-secondary pb-3">
+                <h2 class="h4 text-uppercase border-start border-4 border-info ps-3 mb-0 text-white">
+                    Próximas Estreias
+                </h2>
+            </div>
+            
+            @if (Model.ComingSoon.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var movie in Model.ComingSoon)
+                    {
+                        <div class="col-6 col-md-4 col-lg-3">
+                             <div class="card bg-dark border-0 h-100 shadow-sm movie-card-hover">
+                                <div class="position-relative overflow-hidden rounded-top">
+                                    @if (!string.IsNullOrEmpty(movie.ImageURL))
+                                    {
+                                         <img src="@movie.ImageURL" class="card-img-top" alt="@movie.Title" style="height: 400px; object-fit: cover; filter: grayscale(30%);">
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-secondary d-flex align-items-center justify-content-center text-white-50" style="height: 400px;">
+                                            <i class="fas fa-film fa-3x"></i>
+                                        </div>
+                                    }
+                                    <div class="overlay d-flex align-items-center justify-content-center">
+                                        <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.ID" class="btn btn-light rounded-pill fw-bold">Ver Detalhes</a>
+                                    </div>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-white fw-bold text-truncate">@movie.Title</h5>
+                                    <p class="card-text text-muted small">@string.Join(", ", movie.Genres.Select(g => g.Name))</p>
+                                    <span class="badge bg-info text-dark">Em Breve</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+             else
+            {
+                <div class="text-center py-5">
+                    <h3 class="text-muted">Nenhum lançamento previsto por enquanto.</h3>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Services & Facilities Section -->
+<div class="bg-black py-5 mt-5 border-top border-secondary">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-uppercase">
+                <i class="fas fa-concierge-bell text-warning me-3"></i>Serviços e Facilidades
+            </h2>
+            <p class="text-muted lead">Mais do que filmes, uma experiência completa.</p>
+        </div>
+
+        <div class="row g-4 text-center">
+            <!-- Alugar Sala -->
+            <div class="col-md-4">
+                <div class="p-4 rounded border border-dark bg-dark h-100 hover-lift">
+                    <div class="mb-3 text-primary">
+                        <i class="fas fa-video fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-white mb-3">Aluguel de Salas</h4>
+                    <p class="text-muted mb-4">Realize eventos corporativos, festas privadas ou sessões exclusivas para sua escola ou empresa.</p>
+                    <button class="btn btn-outline-light rounded-pill px-4">Solicitar Orçamento</button>
+                </div>
+            </div>
+
+            <!-- Anuncie Conosco -->
+            <div class="col-md-4">
+                <div class="p-4 rounded border border-dark bg-dark h-100 hover-lift">
+                    <div class="mb-3 text-success">
+                        <i class="fas fa-bullhorn fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-white mb-3">Anuncie Aqui</h4>
+                    <p class="text-muted mb-4">Divulgue sua marca na telona e alcance milhares de pessoas com o impacto do cinema.</p>
+                    <button class="btn btn-outline-light rounded-pill px-4">Mídia Kit</button>
+                </div>
+            </div>
+
+            <!-- Votação (Enquete) -->
+            <div class="col-md-4">
+                <div class="p-4 rounded border border-dark bg-dark h-100 hover-lift">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-vote-yea fa-3x"></i>
+                    </div>
+                    <h4 class="fw-bold text-white mb-3">Você Decide!</h4>
+                    <p class="text-muted mb-4">Vote no clássico que deve voltar em cartaz na próxima semana. A escolha é sua!</p>
+                    <button class="btn btn-warning rounded-pill px-4 text-dark fw-bold">Votar Agora</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Tab Styles */
+    .nav-pills .nav-link {
+        color: rgba(255,255,255,0.5);
+        background-color: transparent;
+        transition: all 0.3s;
+    }
+    .nav-pills .nav-link.active {
+        background-color: var(--secondary-color, #ffc107);
+        color: #000;
+        box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+    }
+    .nav-pills .nav-link:hover:not(.active) {
+        color: #fff;
+    }
+
+    /* Movie Card Hover */
+    .movie-card-hover .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .movie-card-hover:hover .overlay {
+        opacity: 1;
+    }
+    .movie-card-hover img {
+        transition: filter 0.3s;
+    }
+    .movie-card-hover:hover img {
+        filter: grayscale(0%);
+    }
+
+    /* Common Styles */
+    .hover-lift {
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        background-color: #1a1a1a !important;
+    }
+
+    /* Hero Styles */
+    .hero-wrapper {
+        overflow: hidden;
+    }
+    .hero-bg {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: top center;
+        filter: brightness(0.4);
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        transition: transform 10s ease;
+    }
+    .hero-wrapper:hover .hero-bg {
+        transform: scale(1.05); /* Zoom lento */
+    }
+    .hero-overlay {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        z-index: 2;
+        background: linear-gradient(to top, #141414 5%, transparent 60%);
+    }
+    
+    .text-shadow-lg { text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
+    .text-shadow-sm { text-shadow: 1px 1px 4px rgba(0,0,0,0.8); }
+    
+    .backdrop-blur {
+        backdrop-filter: blur(5px);
+        background-color: rgba(255,255,255,0.1);
+    }
+    
+    /* Movie Row Styles */
+    .poster-frame {
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .movie-schedule-row:hover .poster-frame {
+        transform: scale(1.03);
+    }
+    
+    .hover-warning:hover {
+        color: var(--secondary-color) !important;
+        transition: color 0.2s;
+    }
+    
+    .session-btn {
+        min-width: 90px;
+        text-align: center;
+        border-width: 1px;
+        transition: all 0.2s;
+    }
+    .session-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2);
+        background-color: var(--secondary-color);
+        color: black !important;
+    }
+    .session-btn:hover small {
+        color: rgba(0,0,0,0.6) !important;
+    }
+    /* Horizontal Scrollbar Styling */
+    .horizontal-scroll-container::-webkit-scrollbar {
+        height: 10px;
+    }
+    .horizontal-scroll-container::-webkit-scrollbar-track {
+        background: #1a1a1a;
+        border-radius: 5px;
+    }
+    .horizontal-scroll-container::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 5px;
+    }
+    .horizontal-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: var(--secondary-color, #ffc107);
+    }
+</style>

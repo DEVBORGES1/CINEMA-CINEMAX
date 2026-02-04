@@ -1,0 +1,113 @@
+@model Cinema.Models.Movie
+@{
+    ViewData["Title"] = "Detalhes do Filme";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-film text-warning me-2"></i>
+                        @Model?.Title
+                    </h2>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-0">
+                                <img src="@Model?.ImageURL"
+                                     alt="@Model?.Title"
+                                     class="movie-cover d-block mx-auto mb-3" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">
+                                        <i class="fas fa-clock me-1"></i>
+                                        Duração
+                                    </h6>
+                                    <p class="text-muted">@Model?.DurationInMinutes minutos</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">
+                                        <i class="fas fa-user-shield me-1"></i>
+                                        Classificação Indicativa
+                                    </h6>
+                                    <p class="text-muted">@Model?.AgeRating?.Rating</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-tags me-1"></i>
+                                    Gêneros
+                                </h6>
+                                @if (Model?.Genres != null && Model.Genres.Any())
+                                {
+                                    <div>
+                                        @foreach (var genre in Model.Genres)
+                                        {
+                                            <span class="badge bg-warning text-dark me-1 mb-1">@genre.Name</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">—</p>
+                                }
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">
+                                        <i class="fas fa-users me-1"></i>
+                                        Atores
+                                    </h6>
+                                    @{
+                                        var actorsText = (Model?.Actors != null && Model.Actors.Any())
+                                            ? string.Join(", ", Model.Actors.Select(a => $"{(a.FirstName ?? "")} {(a.LastName ?? "")}".Trim()))
+                                            : "—";
+                                    }
+                                    <p class="text-muted">@actorsText</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">
+                                        <i class="fas fa-user-tie me-1"></i>
+                                        Diretores
+                                    </h6>
+                                    @{
+                                        var directorsText = (Model?.Directors != null && Model.Directors.Any())
+                                            ? string.Join(", ", Model.Directors.Select(d => $"{(d.FirstName ?? "")} {(d.LastName ?? "")}".Trim()))
+                                            : "—";
+                                    }
+                                    <p class="text-muted">@directorsText</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-align-left me-1"></i>
+                                    Sinopse
+                                </h6>
+                                <p class="text-muted">@Model?.Synopsis</p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <a asp-action="Index" class="btn btn-outline-warning">
+                                <i class="fas fa-arrow-left me-1"></i> Voltar para Filmes
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

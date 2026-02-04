@@ -1,0 +1,124 @@
+@using System.Globalization
+@model Cinema.Models.Ticket
+@{
+    ViewData["Title"] = "Alterar Ingresso";
+    var initialPrice = Model?.Price.HasValue == true
+        ? Model.Price.Value.ToString("N2", CultureInfo.GetCultureInfo("pt-BR"))
+        : "25,00";
+    var sessions = ViewBag.Sessions as List<Cinema.Models.Session>;
+    var clients = ViewBag.Clients as List<SelectListItem>;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="fw-bold mb-4 text-center">
+                        <i class="fas fa-ticket-alt text-warning me-2"></i>
+                        Alterar Ingresso
+                    </h2>
+
+                    <form asp-action="Update" method="post" asp-route-id="@Model.ID">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ID" />
+
+                        <div class="col-md-6 mb-3">
+                            <label for="SessionID" class="form-label fw-bold">
+                                <i class="fas fa-film me-1"></i> Sessão
+                            </label>
+                            <select name="SessionID" id="SessionID" class="form-control" required>
+                                <option value="">-- Selecionar Sessão --</option>
+                                @if (sessions != null)
+                                {
+                                    foreach (var session in sessions)
+                                    {
+                                        var text = $"{session.Movie?.Title} — {session.StartTime.ToString("dd/MM/yyyy HH:mm")} — Sala {session.Room?.RoomNumber}";
+                                        <option value="@session.ID" selected="@(Model != null && Model.SessionID == session.ID ? "selected" : null)">@text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="PersonID" class="form-label fw-bold">
+                                        <i class="fas fa-user me-1"></i> Cliente
+                                    </label>
+                                    <select name="PersonID" id="PersonID" class="form-control" required>
+                                        <option value="">-- Selecionar Cliente --</option>
+                                        @if (clients != null)
+                                        {
+                                            foreach (var client in clients)
+                                            {
+                                                <option value="@client.Value" selected="@(Model?.PersonID.HasValue == true && Model.PersonID.Value.ToString() == client.Value ? "selected" : null)">@client.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Price" class="form-label fw-bold">
+                                        <i class="fas fa-dollar-sign me-1"></i> Preço
+                                    </label>
+                                    <input asp-for="Price" class="form-control" id="priceInput" value="@initialPrice" />
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <small>Estudantes recebem automaticamente 50% de desconto no preço.</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-controller="Ticket" asp-action="Index" 
+                               class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-arrow-left me-1"></i>Voltar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-check me-1"></i>Salvar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const input = document.getElementById('priceInput');
+
+    function normalizeToNumber(text) {
+        if (!text) return 0;
+        const clean = text.replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+        const n = parseFloat(clean);
+        return isNaN(n) ? 0 : n;
+    }
+
+    function formatPTBR(n) {
+        return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    if (input) {
+        input.value = formatPTBR(normalizeToNumber(input.value));
+
+        input.addEventListener('blur', function () {
+            input.value = formatPTBR(normalizeToNumber(input.value));
+        });
+
+        input.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9\.,]/g, '');
+        });
+    }
+})();
+</script>
+
