@@ -17,11 +17,14 @@
                 Filmes em Cartaz
             </h1>
         </div>
-        <div class="text-center">
-            <a asp-controller="Movie" asp-action="Create" class="btn btn-warning btn-lg">
-                Adicionar
-            </a>
-        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="text-center">
+                <a asp-controller="Movie" asp-action="Create" class="btn btn-warning btn-lg">
+                    Adicionar
+                </a>
+            </div>
+        }
     </div>
     
     <div class="row mb-5">
@@ -98,17 +101,20 @@
                                         @string.Join(", ", movie.Actors.Take(3).Select(a => a.FirstName + " " + a.LastName))
                                     </p>
                                 }
-                                <div class="mt-auto">
-                                    <div class="d-flex gap-2 flex-column flex-sm-row">
-                                        <a asp-action="Update" asp-route-id="@movie.ID"
-                                        class="btn btn-warning flex-fill">
-                                            <i class="fa-solid fa-pen me-1"></i>Editar
-                                        </a>
-                                        <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@movie.ID" onclick="return confirm('Remover este filme?');">
-                                            <i class="fa-solid fa-trash me-1"></i>Excluir
-                                        </a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <div class="mt-auto">
+                                        <div class="d-flex gap-2 flex-column flex-sm-row">
+                                            <a asp-action="Update" asp-route-id="@movie.ID"
+                                            class="btn btn-warning flex-fill">
+                                                <i class="fa-solid fa-pen me-1"></i>Editar
+                                            </a>
+                                            <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@movie.ID" onclick="return confirm('Remover este filme?');">
+                                                <i class="fa-solid fa-trash me-1"></i>Excluir
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
+                                }
                             </div>
                         </div>
                     </a>

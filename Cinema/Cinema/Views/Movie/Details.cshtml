@@ -95,6 +95,51 @@
                                 <p class="text-muted">@Model?.Synopsis</p>
                             </div>
 
+                            <!-- Sessões Disponíveis -->
+                            <div class="mt-4 pt-3 border-top border-secondary">
+                                <h5 class="fw-bold mb-3 text-warning">
+                                    <i class="fas fa-clock me-2"></i>Sessões Disponíveis
+                                </h5>
+                                @{
+                                    var sessions = ViewBag.Sessions as List<Cinema.Models.Session>;
+                                }
+                                @if (sessions != null && sessions.Any())
+                                {
+                                    <div class="row g-3">
+                                        @foreach (var session in sessions)
+                                        {
+                                            <div class="col-md-6 col-lg-4">
+                                                <div class="card bg-dark border border-secondary rounded p-3 h-100 d-flex flex-column justify-content-between">
+                                                    <div>
+                                                        <div class="d-flex justify-content-between mb-2">
+                                                            <span class="badge bg-secondary">Sala @session.Room?.RoomNumber</span>
+                                                            <span class="text-warning fw-bold">R$ @session.Price.ToString("F2")</span>
+                                                        </div>
+                                                        <h6 class="text-white fw-bold mb-1">
+                                                            <i class="far fa-calendar-alt me-1"></i>
+                                                            @session.StartTime.ToString("dd/MM/yyyy")
+                                                        </h6>
+                                                        <p class="text-muted small mb-3">
+                                                            <i class="far fa-clock me-1"></i>
+                                                            @session.StartTime.ToString("HH:mm") - @session.EndTime.ToString("HH:mm")
+                                                        </p>
+                                                    </div>
+                                                    <a asp-controller="Checkout" asp-action="Index" asp-route-sessionId="@session.ID" class="btn btn-warning w-100 fw-bold rounded-pill">
+                                                        <i class="fas fa-ticket-alt me-2"></i>Comprar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-secondary bg-dark text-white border-secondary">
+                                        <i class="fas fa-info-circle me-2"></i>Não há sessões agendadas para este filme no momento.
+                                    </div>
+                                }
+                            </div>
+
                         </div>
                     </div>
 

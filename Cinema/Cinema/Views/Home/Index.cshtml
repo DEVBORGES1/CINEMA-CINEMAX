@@ -1,4 +1,4 @@
-﻿@model Cinema.Models.ViewModels.HomeViewModel
+@model Cinema.Models.ViewModels.HomeViewModel
 
 @{
     ViewData["Title"] = "Home";
@@ -351,6 +351,10 @@
     /* Hero Styles */
     .hero-wrapper {
         overflow: hidden;
+    }
+    .carousel-control-prev,
+    .carousel-control-next {
+        z-index: 10;
     }
     .hero-bg {
         width: 100%;

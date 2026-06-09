@@ -41,6 +41,7 @@ namespace Cinema.Controllers
             return View(movies);
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -70,6 +71,7 @@ namespace Cinema.Controllers
             return View(new Movie());
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Movie movie, int[] SelectedDirectorIds, int[] SelectedActorIds, int? AgeRatingId, int[] SelectedGenreIds, IFormFile? CoverImage)
@@ -156,6 +158,7 @@ namespace Cinema.Controllers
             return View(movie);
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
@@ -166,6 +169,7 @@ namespace Cinema.Controllers
             return RedirectToAction("Index");
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
@@ -216,6 +220,7 @@ namespace Cinema.Controllers
             return View(movie);
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(Movie movie, int[] SelectedDirectorIds, int[] SelectedActorIds, int? AgeRatingId, int[] SelectedGenreIds, IFormFile? CoverImage)
@@ -365,6 +370,16 @@ namespace Cinema.Controllers
             {
                 return NotFound();
             }
+
+            // Busca as sessões futuras para este filme específico
+            var sessions = await _context.Sessions
+                .Include(s => s.Room)
+                .Where(s => s.MovieID == id && s.StartTime > DateTime.Now)
+                .OrderBy(s => s.StartTime)
+                .ToListAsync();
+
+            ViewBag.Sessions = sessions;
+
             return View(movie);
         }
 

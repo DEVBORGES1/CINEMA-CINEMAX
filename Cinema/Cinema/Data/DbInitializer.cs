@@ -1,4 +1,4 @@
-﻿using Cinema.Models;
+using Cinema.Models;
 using Cinema.Models.Enums;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +42,28 @@ namespace Cinema.Data
                 context.SaveChanges();
             }
 
+            // Seed Genres se vazio (precisa ser feito ANTES de Seed Filmes!)
+            if (!context.Genres.Any())
+            {
+                var genres = new Genre[]
+                {
+                    new Genre { Name = "Ação" },
+                    new Genre { Name = "Comédia" },
+                    new Genre { Name = "Drama" },
+                    new Genre { Name = "Romance" },
+                    new Genre { Name = "Terror" },
+                    new Genre { Name = "Ficção Científica" },
+                    new Genre { Name = "Animação" },
+                    new Genre { Name = "Documentário" },
+                    new Genre { Name = "Suspense" },
+                    new Genre { Name = "Fantasia" },
+                    new Genre { Name = "Aventura" },
+                    new Genre { Name = "Musical" }
+                };
+                context.Genres.AddRange(genres);
+                context.SaveChanges();
+            }
+
             // Seed Filmes
             if (!context.Movies.Any())
             {
@@ -62,7 +84,7 @@ namespace Cinema.Data
                         Title = "A Origem",
                         Synopsis = "Dom Cobb é um ladrão habilidoso, o melhor absoluto na perigosa arte da extração, roubando segredos valiosos das profundezas do subconsciente durante o estado de sonho.",
                         DurationInMinutes = 148,
-                        ImageURL = "https://image.tmdb.org/t/p/original/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg", // Poster URL real
+                        ImageURL = "/uploads/a-origem.png",
                         AgeRating = rating14,
                         Genres = new List<Genre> { action, scifi }
                     });
@@ -76,7 +98,7 @@ namespace Cinema.Data
                         Title = "Os Vingadores",
                         Synopsis = "Os heróis mais poderosos da Terra, incluindo Homem de Ferro, Capitão América, Thor e Hulk, se unem para combater um inimigo inesperado.",
                         DurationInMinutes = 143,
-                        ImageURL = "https://image.tmdb.org/t/p/original/u3bZgnGQ9TWA758r89C7Jkm065.jpg",
+                        ImageURL = "/uploads/os-vingadores.png",
                         AgeRating = rating12,
                         Genres = new List<Genre> { action }
                     });
@@ -90,7 +112,7 @@ namespace Cinema.Data
                         Title = "O Poderoso Chefão",
                         Synopsis = "O patriarca idoso de uma dinastia do crime organizado transfere o controle de seu império clandestino para seu filho relutante.",
                         DurationInMinutes = 175,
-                        ImageURL = "https://image.tmdb.org/t/p/original/oJagOzBu9Rdd9BrcimcMmFZWpZs.jpg",
+                        ImageURL = "/uploads/o-poderoso-chefao.png",
                         AgeRating = rating14, // Aprox
                         Genres = new List<Genre> { drama }
                     });
@@ -201,26 +223,7 @@ namespace Cinema.Data
                 context.SaveChanges();
             }
 
-            if (!context.Genres.Any())
-            {
-                var genres = new Genre[]
-                {
-                    new Genre { Name = "Ação" },
-                    new Genre { Name = "Comédia" },
-                    new Genre { Name = "Drama" },
-                    new Genre { Name = "Romance" },
-                    new Genre { Name = "Terror" },
-                    new Genre { Name = "Ficção Científica" },
-                    new Genre { Name = "Animação" },
-                    new Genre { Name = "Documentário" },
-                    new Genre { Name = "Suspense" },
-                    new Genre { Name = "Fantasia" },
-                    new Genre { Name = "Aventura" },
-                    new Genre { Name = "Musical" }
-                };
-                context.Genres.AddRange(genres);
-                context.SaveChanges();
-            }
+
 
             // Seed Users if not exists
             if (!context.Persons.Any(p => p.Email == "admin@cinemax.com"))

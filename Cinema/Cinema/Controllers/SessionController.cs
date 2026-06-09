@@ -24,6 +24,7 @@ namespace Cinema.Controllers
             return View(sessions);
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -36,6 +37,7 @@ namespace Cinema.Controllers
             return View();
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(Session session)
         {
@@ -55,6 +57,7 @@ namespace Cinema.Controllers
             return View(session);
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
@@ -71,6 +74,7 @@ namespace Cinema.Controllers
             return View(session);
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Update(Session session)
         {
@@ -90,6 +94,7 @@ namespace Cinema.Controllers
             return View(session);
         }
 
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

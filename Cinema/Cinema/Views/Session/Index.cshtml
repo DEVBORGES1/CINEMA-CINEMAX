@@ -17,11 +17,14 @@
                 Sessões Disponíveis
             </h1>
         </div>
-        <div class="text-center">
-            <a asp-controller="Session" asp-action="Create" class="btn btn-warning btn-lg">
-                Adicionar
-            </a>
-        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="text-center">
+                <a asp-controller="Session" asp-action="Create" class="btn btn-warning btn-lg">
+                    Adicionar
+                </a>
+            </div>
+        }
     </div>
 
     @if (Model != null && Model.Any())
@@ -67,13 +70,16 @@
                                            class="btn btn-success flex-fill">
                                             <i class="fas fa-ticket-alt me-1"></i>Comprar
                                         </a>
-                                        <a asp-action="Update" asp-route-id="@session.ID"
-                                           class="btn btn-warning flex-fill">
-                                            <i class="fa-solid fa-pen me-1"></i>Editar
-                                        </a>
-                                        <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@session.ID" onclick="return confirm('Remover esta sessão?');">
-                                            <i class="fa-solid fa-trash me-1"></i>Excluir
-                                        </a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="Update" asp-route-id="@session.ID"
+                                               class="btn btn-warning flex-fill">
+                                                <i class="fa-solid fa-pen me-1"></i>Editar
+                                            </a>
+                                            <a href="#" class="btn btn-danger flex-fill delete-link" data-id="@session.ID" onclick="return confirm('Remover esta sessão?');">
+                                                <i class="fa-solid fa-trash me-1"></i>Excluir
+                                            </a>
+                                        }
                                     </div>
                                  </div>
                             </div>
