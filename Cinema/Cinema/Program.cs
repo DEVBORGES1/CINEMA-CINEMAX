@@ -10,7 +10,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<CinemaContext>(options =>
-    options.UseSqlServer(
+    options.UseSqlite(
         builder.Configuration.GetConnectionString("CinemaContext")));
 
 // Register repositories

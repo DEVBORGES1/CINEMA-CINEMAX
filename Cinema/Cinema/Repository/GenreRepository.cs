@@ -1,4 +1,4 @@
-﻿using Cinema.Models;
+using Cinema.Models;
 using Cinema.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,10 +6,10 @@ namespace Cinema.Repository
 {
     public class GenreRepository : IGenreRepository
     {
-         private readonly CinemaContext? _context;
-        public GenreRepository(CinemaContext? context)
+        private readonly CinemaContext _context;
+        public GenreRepository(CinemaContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         public async Task Create(Genre genre)
         {

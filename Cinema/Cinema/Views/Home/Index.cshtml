@@ -20,12 +20,12 @@
                 var movie = Model.FeaturedMovies[i];
                 <div class="carousel-item h-100 @(i == 0 ? "active" : "")">
                     <div class="hero-bg" style="background-image: url('@movie.ImageURL');"></div>
-                    <div class="hero-overlay d-flex align-items-end pb-5">
-                        <div class="container pb-5">
-                            <div class="row">
-                                <div class="col-lg-6">
+                    <div class="hero-overlay d-flex align-items-center pb-5">
+                        <div class="container pt-5">
+                            <div class="row align-items-center">
+                                <div class="col-md-7 col-lg-7 text-start">
                                     <span class="badge bg-warning text-dark fw-bold mb-3 px-3 py-2 text-uppercase">Em Destaque</span>
-                                    <h1 class="display-1 fw-bold text-white mb-2 text-shadow-lg">@movie.Title</h1>
+                                    <h1 class="display-2 fw-bold text-white mb-2 text-shadow-lg">@movie.Title</h1>
                                     <div class="d-flex align-items-center gap-3 text-white-50 mb-4 fs-5">
                                         <span><i class="fas fa-clock me-1"></i>@movie.DurationInMinutes min</span>
                                         <span>|</span>
@@ -33,7 +33,7 @@
                                         <span>|</span>
                                         <span>@string.Join(", ", movie.Genres.Select(g => g.Name))</span>
                                     </div>
-                                    <p class="lead text-white mb-4 text-shadow-sm d-none d-md-block">@movie.Synopsis</p>
+                                    <p class="lead text-white mb-4 text-shadow-sm d-none d-md-block" style="max-height: 120px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">@movie.Synopsis</p>
                                     <div class="d-flex gap-3">
                                          <a asp-controller="Movie" asp-action="Details" asp-route-id="@movie.ID" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow-lg">
                                             <i class="fas fa-ticket-alt me-2"></i>Ver Sessões
@@ -42,6 +42,9 @@
                                             <i class="fas fa-info-circle me-2"></i>Detalhes
                                         </a>
                                     </div>
+                                </div>
+                                <div class="col-md-5 col-lg-5 d-none d-md-flex justify-content-center align-items-center">
+                                    <img src="@movie.ImageURL" asp-append-version="true" alt="@movie.Title" class="hero-poster img-fluid rounded-3 shadow-lg" style="max-height: 52vh; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.8); transition: transform 0.3s;" />
                                 </div>
                             </div>
                         </div>
@@ -153,7 +156,7 @@
                                     
                                     @if (!string.IsNullOrEmpty(item.Movie.ImageURL))
                                     {
-                                        <img src="@item.Movie.ImageURL" class="card-img-top" alt="@item.Movie.Title" style="height: 380px; object-fit: cover;">
+                                        <img src="@item.Movie.ImageURL" asp-append-version="true" class="card-img-top" alt="@item.Movie.Title" style="width: 100%; aspect-ratio: 2/3; object-fit: cover;">
                                     }
                                     else
                                     {
@@ -220,7 +223,7 @@
                                 <div class="position-relative overflow-hidden rounded-top">
                                     @if (!string.IsNullOrEmpty(movie.ImageURL))
                                     {
-                                         <img src="@movie.ImageURL" class="card-img-top" alt="@movie.Title" style="height: 400px; object-fit: cover; filter: grayscale(30%);">
+                                         <img src="@movie.ImageURL" asp-append-version="true" class="card-img-top" alt="@movie.Title" style="width: 100%; aspect-ratio: 2/3; object-fit: cover; filter: grayscale(30%);">
                                     }
                                     else
                                     {
@@ -360,23 +363,27 @@
         width: 100%;
         height: 100%;
         background-size: cover;
-        background-position: top center;
-        filter: brightness(0.4);
+        background-position: center;
+        filter: brightness(0.2) blur(15px);
         position: absolute;
         top: 0;
         left: 0;
         z-index: 1;
+        transform: scale(1.1); /* Evita bordas brancas por causa do blur */
         transition: transform 10s ease;
     }
     .hero-wrapper:hover .hero-bg {
-        transform: scale(1.05); /* Zoom lento */
+        transform: scale(1.15); /* Zoom lento e suave */
     }
     .hero-overlay {
         width: 100%;
         height: 100%;
         position: relative;
         z-index: 2;
-        background: linear-gradient(to top, #141414 5%, transparent 60%);
+        background: linear-gradient(to top, #141414 10%, rgba(20, 20, 20, 0.4) 60%, #141414 100%);
+    }
+    .hero-poster:hover {
+        transform: scale(1.03);
     }
     
     .text-shadow-lg { text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }

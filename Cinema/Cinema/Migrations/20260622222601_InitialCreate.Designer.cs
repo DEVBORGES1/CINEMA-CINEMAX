@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -11,29 +10,23 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cinema.Migrations
 {
     [DbContext(typeof(CinemaContext))]
-    [Migration("20251115000222_PriceAdjustments")]
-    partial class PriceAdjustments
+    [Migration("20260622222601_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.9")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
 
             modelBuilder.Entity("Cinema.Models.AgeRating", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Rating")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ID");
 
@@ -44,12 +37,10 @@ namespace Cinema.Migrations
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ID");
 
@@ -60,21 +51,22 @@ namespace Cinema.Migrations
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("AgeRatingID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("DurationInMinutes")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ImageURL")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Synopsis")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ID");
 
@@ -83,46 +75,72 @@ namespace Cinema.Migrations
                     b.ToTable("Movies");
                 });
 
+            modelBuilder.Entity("Cinema.Models.Order", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("PersonID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PersonID");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("Cinema.Models.Person", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateOnly?>("BirthDate")
-                        .HasColumnType("date");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("CPF")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateOnly?>("EnrollmentDate")
-                        .HasColumnType("date");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActor")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsClient")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsDirector")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsStudent")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
 
@@ -133,13 +151,11 @@ namespace Cinema.Migrations
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ID");
 
@@ -150,15 +166,19 @@ namespace Cinema.Migrations
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Capacity")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Columns")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("RoomNumber")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Rows")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
 
@@ -169,21 +189,22 @@ namespace Cinema.Migrations
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("MovieID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RoomID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ID");
 
@@ -194,27 +215,90 @@ namespace Cinema.Migrations
                     b.ToTable("Sessions");
                 });
 
+            modelBuilder.Entity("Cinema.Models.Snack", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageURL")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Snacks");
+                });
+
+            modelBuilder.Entity("Cinema.Models.SnackOrder", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("PriceAtPurchase")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SnackID")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("OrderID");
+
+                    b.HasIndex("SnackID");
+
+                    b.ToTable("SnackOrders");
+                });
+
             modelBuilder.Entity("Cinema.Models.Ticket", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    b.Property<int?>("OrderID")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("PersonID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SeatNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SeatRow")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("SessionID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("OrderID");
 
                     b.HasIndex("PersonID");
 
@@ -226,10 +310,10 @@ namespace Cinema.Migrations
             modelBuilder.Entity("GenreMovie", b =>
                 {
                     b.Property<int>("GenresID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("MoviesID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("GenresID", "MoviesID");
 
@@ -241,10 +325,10 @@ namespace Cinema.Migrations
             modelBuilder.Entity("MoviePerson", b =>
                 {
                     b.Property<int>("ActedMoviesID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("ActorsID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ActedMoviesID", "ActorsID");
 
@@ -256,10 +340,10 @@ namespace Cinema.Migrations
             modelBuilder.Entity("MoviePerson1", b =>
                 {
                     b.Property<int>("DirectedMoviesID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("DirectorsID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("DirectedMoviesID", "DirectorsID");
 
@@ -271,10 +355,10 @@ namespace Cinema.Migrations
             modelBuilder.Entity("PersonRole", b =>
                 {
                     b.Property<int>("PersonsID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("RolesID")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("PersonsID", "RolesID");
 
@@ -290,6 +374,15 @@ namespace Cinema.Migrations
                         .HasForeignKey("AgeRatingID");
 
                     b.Navigation("AgeRating");
+                });
+
+            modelBuilder.Entity("Cinema.Models.Order", b =>
+                {
+                    b.HasOne("Cinema.Models.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonID");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("Cinema.Models.Session", b =>
@@ -311,8 +404,31 @@ namespace Cinema.Migrations
                     b.Navigation("Room");
                 });
 
+            modelBuilder.Entity("Cinema.Models.SnackOrder", b =>
+                {
+                    b.HasOne("Cinema.Models.Order", "Order")
+                        .WithMany("Snacks")
+                        .HasForeignKey("OrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Cinema.Models.Snack", "Snack")
+                        .WithMany()
+                        .HasForeignKey("SnackID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Snack");
+                });
+
             modelBuilder.Entity("Cinema.Models.Ticket", b =>
                 {
+                    b.HasOne("Cinema.Models.Order", "Order")
+                        .WithMany("Tickets")
+                        .HasForeignKey("OrderID");
+
                     b.HasOne("Cinema.Models.Person", "Person")
                         .WithMany()
                         .HasForeignKey("PersonID");
@@ -322,6 +438,8 @@ namespace Cinema.Migrations
                         .HasForeignKey("SessionID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Person");
 
@@ -386,6 +504,13 @@ namespace Cinema.Migrations
                         .HasForeignKey("RolesID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Cinema.Models.Order", b =>
+                {
+                    b.Navigation("Snacks");
+
+                    b.Navigation("Tickets");
                 });
 
             modelBuilder.Entity("Cinema.Models.Session", b =>

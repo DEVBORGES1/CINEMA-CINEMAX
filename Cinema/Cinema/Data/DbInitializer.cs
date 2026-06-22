@@ -298,17 +298,7 @@ namespace Cinema.Data
                 var nocaute = context.Movies.FirstOrDefault(m => m.Title == "Nocaute");
                 var granTurismo = context.Movies.FirstOrDefault(m => m.Title == "Gran Turismo: De Jogador a Corredor");
 
-                if (matrix != null && room3 != null)
-                {
-                    context.Sessions.Add(new Session { Movie = matrix, Room = room3, StartTime = DateTime.Now.AddHours(2), Price = 20.00m });
-                    context.Sessions.Add(new Session { Movie = matrix, Room = room3, StartTime = DateTime.Now.AddDays(1).AddHours(4), Price = 22.00m });
-                }
 
-                if (interstellar != null && room4 != null)
-                {
-                    context.Sessions.Add(new Session { Movie = interstellar, Room = room4, StartTime = DateTime.Now.AddHours(3.5), Price = 25.00m });
-                    context.Sessions.Add(new Session { Movie = interstellar, Room = room4, StartTime = DateTime.Now.AddDays(1).AddHours(6), Price = 25.00m });
-                }
 
                 if (nocaute != null && room1 != null)
                 {

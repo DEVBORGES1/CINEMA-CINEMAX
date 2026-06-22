@@ -241,6 +241,29 @@ namespace Cinema.Controllers
             return View(ticket);
         }
 
+        [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> GenerateQRCode(int? id)
+        {
+            if (!id.HasValue)
+                return BadRequest();
+
+            var ticket = await _ticketRepository.GetById(id.Value);
+            if (ticket == null)
+                return NotFound();
+
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return RedirectToAction("Login", "Auth");
+            int userId = int.Parse(userIdClaim.Value);
+
+            if (ticket.PersonID != userId && !User.IsInRole("Admin") && !User.IsInRole("Seller"))
+            {
+                return Forbid();
+            }
+
+            return View(ticket);
+        }
+
         //Gera QR code para o ingresso
         [HttpGet]
         public async Task<IActionResult> QrCode(int? id, int pixelsPerModule = 4)

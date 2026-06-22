@@ -1,4 +1,4 @@
-﻿@model Cinema.Models.Person
+@model Cinema.Models.Person
 
 @{
     ViewData["Title"] = "Pessoas";
@@ -41,7 +41,7 @@
     <div class="mx-auto">
         <form asp-action="Update" method="post"
               id="personForm"
-              asp-route-personId="@Model.ID">
+              asp-route-personId="@Model?.ID">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 

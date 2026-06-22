@@ -1,4 +1,4 @@
-﻿using Cinema.Models;
+using Cinema.Models;
 using Cinema.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,10 +6,10 @@ namespace Cinema.Repository
 {
     public class TicketRepository : ITicketRepository
     {
-        private readonly CinemaContext? _context;
-        public TicketRepository(CinemaContext? context)
+        private readonly CinemaContext _context;
+        public TicketRepository(CinemaContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<List<Ticket>> GetAll()
@@ -17,10 +17,10 @@ namespace Cinema.Repository
             return await _context.Tickets
                 .Include(t => t.Person)
                 .Include(t => t.Session)
-                    .ThenInclude(s => s.Movie)
-                        .ThenInclude(m => m.AgeRating)
+                    .ThenInclude(s => s!.Movie)
+                        .ThenInclude(m => m!.AgeRating)
                 .Include(t => t.Session)
-                    .ThenInclude(s => s.Room)
+                    .ThenInclude(s => s!.Room)
                 .ToListAsync();
         }
 
@@ -29,10 +29,10 @@ namespace Cinema.Repository
             return await _context.Tickets
                 .Include(t => t.Person)
                 .Include(t => t.Session)
-                    .ThenInclude(s => s.Movie)
-                        .ThenInclude(m => m.AgeRating)
+                    .ThenInclude(s => s!.Movie)
+                        .ThenInclude(m => m!.AgeRating)
                 .Include(t => t.Session)
-                    .ThenInclude(s => s.Room)
+                    .ThenInclude(s => s!.Room)
                 .FirstOrDefaultAsync(t => t.ID == id);
         }
 
@@ -41,10 +41,10 @@ namespace Cinema.Repository
             return await _context.Tickets
                 .Include(t => t.Person)
                 .Include(t => t.Session)
-                    .ThenInclude(s => s.Movie)
-                        .ThenInclude(m => m.AgeRating)
+                    .ThenInclude(s => s!.Movie)
+                        .ThenInclude(m => m!.AgeRating)
                 .Include(t => t.Session)
-                    .ThenInclude(s => s.Room)
+                    .ThenInclude(s => s!.Room)
                 .Where(t => t.SessionID == sessionId)
                 .ToListAsync();
         }
@@ -54,10 +54,10 @@ namespace Cinema.Repository
             return await _context.Tickets
                 .Include(t => t.Person)
                 .Include(t => t.Session)
-                    .ThenInclude(s => s.Movie)
-                        .ThenInclude(m => m.AgeRating)
+                    .ThenInclude(s => s!.Movie)
+                        .ThenInclude(m => m!.AgeRating)
                 .Include(t => t.Session)
-                    .ThenInclude(s => s.Room)
+                    .ThenInclude(s => s!.Room)
                 .Where(t => t.PersonID == personId)
                 .OrderByDescending(t => t.PurchaseDate)
                 .ToListAsync();

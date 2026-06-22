@@ -1,53 +1,172 @@
 @model Cinema.Models.Order
+@using System.Globalization
 @{
     ViewData["Title"] = "Pedido Confirmado!";
 }
 
-<div class="container py-5 text-center">
-    <div class="card bg-dark text-white border-secondary shadow-lg mx-auto" style="max-width: 600px;">
-        <div class="card-body p-5">
-            <div class="mb-4 text-success">
-                <i class="fas fa-check-circle fa-5x animate-pulse"></i>
-            </div>
-            
-            <h2 class="fw-bold mb-3">Pagamento Aprovado!</h2>
-            <p class="text-white-50 mb-5">Seu pedido #@Model.ID foi processado com sucesso. Enviamos os detalhes para seu e-mail.</p>
+<div class="container py-5">
+    <!-- Header: Success Message (Hidden on Print) -->
+    <div class="text-center mb-5 no-print">
+        <div class="mb-4 text-success">
+            <i class="fas fa-check-circle fa-5x animate-pulse"></i>
+        </div>
+        <h2 class="fw-bold mb-2 text-white">Pagamento Aprovado!</h2>
+        <p class="text-white-50">Seu pedido <strong>#@Model.ID</strong> foi processado com sucesso. Imprima seus ingressos abaixo para apresentar na entrada.</p>
+    </div>
 
-            <div class="bg-black bg-opacity-25 p-4 rounded border border-secondary mb-5 text-start">
-                <h5 class="fw-bold border-bottom border-secondary pb-2 mb-3">Detalhes</h5>
-                
-                @if(Model.Tickets.Any())
-                {
-                    var firstTicket = Model.Tickets.First();
-                    <div class="mb-3">
-                        <strong class="d-block text-warning me-2"><i class="fas fa-film me-2"></i>@firstTicket.Session?.Movie?.Title</strong>
-                        <small class="text-white-50 d-block mb-1">@firstTicket.Session?.StartTime.ToString("dd/MM/yyyy HH:mm")</small>
-                        <small class="text-white-50">Sala @firstTicket.Session?.Room?.RoomNumber - Assentos: @string.Join(", ", Model.Tickets.Select(t => t.SeatRow + t.SeatNumber))</small>
+    <!-- Tickets Container (Centered) -->
+    <div class="d-flex flex-column align-items-center gap-5 mb-5">
+        @foreach (var ticket in Model.Tickets)
+        {
+            <div class="ticket-wrapper animated-fade-in">
+                <div class="ticket-card-3d">
+                    <!-- TICKET TOP: Movie & Session Info -->
+                    <div class="ticket-top">
+                        <div class="ticket-glow"></div>
+                        <div class="d-flex align-items-start gap-4">
+                            <!-- Mini Poster -->
+                            <div class="ticket-poster d-none d-sm-block">
+                                @if (!string.IsNullOrEmpty(ticket.Session?.Movie?.ImageURL))
+                                {
+                                    <img src="@ticket.Session.Movie.ImageURL" alt="Poster de @ticket.Session.Movie.Title" />
+                                }
+                                else
+                                {
+                                    <div class="poster-fallback"><i class="fas fa-film fa-2x text-white-50"></i></div>
+                                }
+                            </div>
+                            
+                            <!-- Text Details -->
+                            <div class="flex-grow-1">
+                                <span class="badge bg-warning text-dark fw-bold mb-2 text-uppercase tracking-wider">CineMax Ingresso</span>
+                                <h2 class="movie-title mb-2">@(ticket.Session?.Movie?.Title ?? "Título indisponível")</h2>
+                                
+                                <div class="d-flex flex-wrap gap-2 align-items-center small text-white-50 mb-3">
+                                    <span><i class="fas fa-clock me-1"></i>@(ticket.Session?.Movie?.DurationInMinutes ?? 0) min</span>
+                                    <span>•</span>
+                                    <span class="badge border border-secondary text-white">@(ticket.Session?.Movie?.AgeRating?.Rating ?? "Livre")</span>
+                                    <span>•</span>
+                                    <span class="movie-genres">
+                                        @(ticket.Session?.Movie?.Genres != null && ticket.Session.Movie.Genres.Any() 
+                                            ? string.Join(", ", ticket.Session.Movie.Genres.Select(g => g.Name)) 
+                                            : "Gênero não informado")
+                                    </span>
+                                </div>
+
+                                <div class="row g-2 mt-2">
+                                    <div class="col-6">
+                                        <small class="info-label">SALA</small>
+                                        <div class="info-value font-highlight text-warning">@(ticket.Session?.Room?.RoomNumber ?? 0)</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="info-label">ASSENTO</small>
+                                        <div class="info-value font-highlight text-white">@ticket.SeatRow@ticket.SeatNumber</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                }
 
-                @if (Model.Snacks.Any())
-                {
-                    <div class="border-top border-secondary pt-3 mt-3">
-                        <strong class="d-block text-warning mb-2"><i class="fas fa-utensils me-2"></i>Itens da Bombonière</strong>
-                        <ul class="list-unstyled text-white-50 small mb-0">
-                            @foreach(var item in Model.Snacks)
-                            {
-                                <li>@item.Quantity x @item.Snack?.Name</li>
-                            }
-                        </ul>
+                    <!-- TICKET DIVIDER: Perforated/Dashed with Circle Cutouts -->
+                    <div class="ticket-divider">
+                        <div class="circle-cutout-left"></div>
+                        <div class="dashed-line"></div>
+                        <div class="circle-cutout-right"></div>
                     </div>
-                }
-            </div>
 
-            <div class="d-grid gap-2">
-                <a asp-controller="Home" asp-action="Index" class="btn btn-primary fw-bold rounded-pill">
-                    <i class="fas fa-home me-2"></i>Voltar ao Início
-                </a>
-                <a href="#" class="btn btn-outline-light rounded-pill" onclick="window.print()">
-                    <i class="fas fa-print me-2"></i>Imprimir Comprovante
-                </a>
+                    <!-- TICKET BOTTOM: QR Code & Stub Details -->
+                    <div class="ticket-bottom">
+                        <div class="row g-4 align-items-center">
+                            <!-- Left: Details -->
+                            <div class="col-md-7 text-start">
+                                <div class="row g-3 mb-3">
+                                    <div class="col-6 col-sm-4">
+                                        <small class="info-label">DATA</small>
+                                        <div class="info-value-sm text-white">@ticket.Session?.StartTime.ToString("dd/MM/yyyy")</div>
+                                    </div>
+                                    <div class="col-6 col-sm-4">
+                                        <small class="info-label">HORÁRIO</small>
+                                        <div class="info-value-sm text-white">@ticket.Session?.StartTime.ToString("HH:mm")</div>
+                                    </div>
+                                    <div class="col-12 col-sm-4">
+                                        <small class="info-label">PREÇO</small>
+                                        <div class="info-value-sm text-success fw-bold">@((ticket.Price ?? 0m).ToString("C2", CultureInfo.GetCultureInfo("pt-BR")))</div>
+                                    </div>
+                                </div>
+
+                                <div class="border-top border-secondary pt-3 mt-3">
+                                    <p class="mb-1 text-white-50 small">
+                                        <i class="fas fa-user me-1"></i> 
+                                        <strong>Cliente:</strong> @(ticket.Person != null ? $"{ticket.Person.FirstName} {ticket.Person.LastName}" : "Consumidor")
+                                    </p>
+                                    <p class="mb-1 text-white-50 small">
+                                        <i class="fas fa-receipt me-1"></i> 
+                                        <strong>Ingresso Nº:</strong> #@ticket.ID
+                                    </p>
+                                    <p class="mb-0 text-white-50 small">
+                                        <i class="fas fa-calendar-alt me-1"></i> 
+                                        <strong>Comprado em:</strong> @ticket.PurchaseDate.ToString("dd/MM/yyyy HH:mm")
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Right: QR Code Container -->
+                            <div class="col-md-5 d-flex flex-column align-items-center justify-content-center border-start-md border-secondary-dashed py-2">
+                                <div class="qrcode-container mb-2 p-2">
+                                    <img src="@Url.Action("QrCode", "Ticket", new { id = ticket.ID, pixelsPerModule = 6 })" alt="QR Code do Ingresso" />
+                                </div>
+                                <span class="text-uppercase tracking-wider small text-white-50 font-monospace">Apresentar na Entrada</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        }
+    </div>
+
+    <!-- Snacks and Bomboniere (Hidden on Print) -->
+    @if (Model.Snacks.Any())
+    {
+        <div class="card bg-dark text-white border-secondary shadow-lg mx-auto mb-5 no-print" style="max-width: 600px;">
+            <div class="card-header border-secondary bg-black bg-opacity-50 p-4">
+                <h5 class="fw-bold mb-0 text-uppercase border-start border-4 border-warning ps-3">
+                    <i class="fas fa-utensils me-2 text-white-50"></i>Itens de Bombonière Adquiridos
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    @foreach(var item in Model.Snacks)
+                    {
+                        <li class="d-flex justify-content-between mb-2">
+                            <span>@item.Quantity x @item.Snack?.Name</span>
+                            <span class="text-white">@((item.PriceAtPurchase * item.Quantity).ToString("C2", CultureInfo.GetCultureInfo("pt-BR")))</span>
+                        </li>
+                    }
+                </ul>
+                <div class="border-top border-secondary pt-3 mt-3 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Total do Pedido (Ingressos + Bombonière):</span>
+                    <span class="h4 text-warning fw-bold mb-0">@Model.TotalAmount.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"))</span>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Total order amount if no snacks (Hidden on Print) -->
+        <div class="text-center mb-5 no-print">
+            <p class="text-white-50">Total Pago: <strong class="text-warning fs-4">@Model.TotalAmount.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"))</strong></p>
+        </div>
+    }
+
+    <!-- Actions (Hidden on Print) -->
+    <div class="text-center no-print pb-5">
+        <div class="d-flex gap-3 justify-content-center">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-light btn-lg px-5 rounded-pill fw-bold">
+                <i class="fas fa-home me-2"></i>Voltar ao Início
+            </a>
+            <button onclick="window.print()" class="btn btn-warning btn-lg px-5 rounded-pill text-dark fw-bold">
+                <i class="fas fa-print me-2"></i>Imprimir Ingressos
+            </button>
         </div>
     </div>
 </div>
@@ -60,5 +179,235 @@
         0% { transform: scale(1); opacity: 1; }
         50% { transform: scale(1.1); opacity: 0.8; }
         100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Ticket Card Wrappers & Styling */
+    .ticket-wrapper {
+        position: relative;
+        z-index: 5;
+        width: 100%;
+        max-width: 600px;
+        perspective: 1000px;
+    }
+
+    .ticket-card-3d {
+        background: rgba(26, 26, 26, 0.45);
+        backdrop-filter: blur(12px) saturate(160%);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 193, 7, 0.05);
+        overflow: hidden;
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s;
+    }
+
+    .ticket-card-3d:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.6), 0 0 60px rgba(255, 193, 7, 0.1);
+    }
+
+    /* Top Section */
+    .ticket-top {
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ticket-glow {
+        position: absolute;
+        top: -150px;
+        right: -150px;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 193, 7, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ticket-poster {
+        width: 110px;
+        height: auto;
+        aspect-ratio: 2/3;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .ticket-poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .poster-fallback {
+        width: 100%;
+        height: 100%;
+        background: #2a2a2a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .movie-title {
+        font-weight: 800;
+        font-size: 1.8rem;
+        color: #fff;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+    }
+
+    .tracking-wider {
+        letter-spacing: 2px;
+    }
+
+    /* Perforated Divider Styling */
+    .ticket-divider {
+        position: relative;
+        height: 24px;
+        display: flex;
+        align-items: center;
+    }
+
+    .circle-cutout-left,
+    .circle-cutout-right {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background: #141414; /* Match main layout dark background */
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        z-index: 10;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .circle-cutout-left {
+        left: -12px;
+    }
+
+    .circle-cutout-right {
+        right: -12px;
+    }
+
+    .dashed-line {
+        width: 100%;
+        height: 0;
+        border-top: 2px dashed rgba(255, 255, 255, 0.15);
+        margin: 0 12px;
+    }
+
+    /* Bottom Section */
+    .ticket-bottom {
+        padding: 30px;
+        background: rgba(0, 0, 0, 0.15);
+    }
+
+    .info-label {
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 700;
+        font-size: 0.7rem;
+        letter-spacing: 1.5px;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .info-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+
+    .info-value-sm {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .font-highlight {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* QR Code Container Styling */
+    .qrcode-container {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        display: inline-block;
+        transition: transform 0.3s;
+    }
+
+    .qrcode-container:hover {
+        transform: scale(1.03);
+    }
+
+    .qrcode-container img {
+        display: block;
+        width: 130px;
+        height: 130px;
+    }
+
+    .border-secondary-dashed {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Medium screens and up */
+    @@media (min-width: 768px) {
+        .border-start-md {
+            border-left: 1px dashed rgba(255, 255, 255, 0.15) !important;
+        }
+    }
+
+    /* Print Styles */
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+        main, main * {
+            visibility: hidden;
+        }
+        .no-print {
+            display: none !important;
+        }
+        /* Make tickets visible for print */
+        .container, .ticket-wrapper, .ticket-wrapper * {
+            visibility: visible;
+        }
+        .container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+        }
+        .ticket-wrapper {
+            page-break-after: always;
+            margin: 0 auto 30px auto !important;
+            box-shadow: none !important;
+        }
+        .ticket-wrapper:last-child {
+            page-break-after: avoid;
+        }
+        .ticket-card-3d {
+            background: #fff !important;
+            color: #000 !important;
+            border: 2px solid #000 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        .movie-title, .info-value-sm, .font-highlight, p.text-white-50, strong, span.text-white {
+            color: #000 !important;
+        }
+        .info-label {
+            color: #555 !important;
+        }
+        .circle-cutout-left, .circle-cutout-right {
+            background: #fff !important;
+            border-color: #000 !important;
+            box-shadow: none !important;
+        }
+        .dashed-line {
+            border-top: 2px dashed #000 !important;
+        }
     }
 </style>

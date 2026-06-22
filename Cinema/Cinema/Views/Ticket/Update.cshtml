@@ -19,7 +19,7 @@
                         Alterar Ingresso
                     </h2>
 
-                    <form asp-action="Update" method="post" asp-route-id="@Model.ID">
+                    <form asp-action="Update" method="post" asp-route-id="@Model?.ID">
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="ID" />
 

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.Controllers
 {
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class CheckoutController : Controller
     {
         private readonly CinemaContext _context;
@@ -225,12 +226,20 @@ namespace Cinema.Controllers
             var state = HttpContext.Session.Get<CheckoutViewModel>("CheckoutState");
             if (state == null) return RedirectToAction("Index", "Home");
 
+            // Extract Logged in User ID from Claims
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            int? userId = null;
+            if (int.TryParse(userIdStr, out int id))
+            {
+                userId = id;
+            }
+
             // 1. Create Order
             var order = new Order
             {
                 OrderDate = DateTime.Now,
                 TotalAmount = state.TotalPrice,
-                // PersonID could be linked if user is logged in
+                PersonID = userId // Link order to user
             };
             
             _context.Orders.Add(order);
@@ -250,7 +259,8 @@ namespace Cinema.Controllers
                     Price = state.Session?.Price, // Simplification: Not tracking exact price per ticket type here properly in DB unless we split details
                     SeatRow = row,
                     SeatNumber = number,
-                    PurchaseDate = DateTime.Now
+                    PurchaseDate = DateTime.Now,
+                    PersonID = userId // Link ticket to user
                 };
                 
                 // Logic to set specific price if needed, but for now using session base or average
@@ -281,8 +291,22 @@ namespace Cinema.Controllers
         public async Task<IActionResult> Confirmation(int orderId)
         {
             var order = await _context.Orders
-                .Include(o => o.Tickets).ThenInclude(t => t.Session).ThenInclude(s => s.Movie)
-                .Include(o => o.Snacks).ThenInclude(s => s.Snack)
+                .Include(o => o.Person)
+                .Include(o => o.Tickets)
+                    .ThenInclude(t => t.Person)
+                .Include(o => o.Tickets)
+                    .ThenInclude(t => t.Session)
+                        .ThenInclude(s => s!.Movie)
+                            .ThenInclude(m => m!.AgeRating)
+                .Include(o => o.Tickets)
+                    .ThenInclude(t => t.Session)
+                        .ThenInclude(s => s!.Movie)
+                            .ThenInclude(m => m!.Genres)
+                .Include(o => o.Tickets)
+                    .ThenInclude(t => t.Session)
+                        .ThenInclude(s => s!.Room)
+                .Include(o => o.Snacks)
+                    .ThenInclude(s => s.Snack)
                 .FirstOrDefaultAsync(o => o.ID == orderId);
 
             if (order == null) return NotFound();

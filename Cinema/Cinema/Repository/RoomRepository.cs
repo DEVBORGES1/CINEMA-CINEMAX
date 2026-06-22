@@ -1,17 +1,18 @@
-﻿using Cinema.Models;
+using Cinema.Models;
 using Cinema.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 namespace Cinema.Repository
 {
     public class RoomRepository : IRoomRepository
     {
-         private readonly CinemaContext? _context;
-        public RoomRepository(CinemaContext? context)
+        private readonly CinemaContext _context;
+        public RoomRepository(CinemaContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<List<Room>> GetAll()

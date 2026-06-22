@@ -1,4 +1,4 @@
-﻿using Cinema.Models;
+using Cinema.Models;
 using Cinema.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,10 +6,10 @@ namespace Cinema.Repository
 {
     public class SessionRepository : ISessionRepository
     {
-         private readonly CinemaContext? _context;
-        public SessionRepository(CinemaContext? context)
+        private readonly CinemaContext _context;
+        public SessionRepository(CinemaContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         public async Task<List<Session>> GetAll()
         {
@@ -24,7 +24,7 @@ namespace Cinema.Repository
         {
             return await _context.Sessions
                 .Include(s => s.Movie)
-                    .ThenInclude(m => m.AgeRating)
+                    .ThenInclude(m => m!.AgeRating)
                 .Include(s => s.Room)
                 .Include(s => s.Tickets)
                 .FirstOrDefaultAsync(s => s.ID == id);

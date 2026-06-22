@@ -1,4 +1,4 @@
-﻿using Cinema.Models;
+using Cinema.Models;
 using Cinema.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,10 +6,10 @@ namespace Cinema.Repository
 {
     public class MovieRepository : IMovieRepository
     {
-         private readonly CinemaContext? _context;
-        public MovieRepository(CinemaContext? context)
+        private readonly CinemaContext _context;
+        public MovieRepository(CinemaContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         public async Task<List<Movie>> GetAll()
         {

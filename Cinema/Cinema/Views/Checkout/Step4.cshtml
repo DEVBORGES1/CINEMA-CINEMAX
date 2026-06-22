@@ -28,7 +28,7 @@
                 <div class="card-body p-4">
                     <!-- Movie -->
                     <div class="d-flex gap-3 mb-4 pb-4 border-bottom border-secondary">
-                        <img src="@Model.Session?.Movie?.ImageURL" alt="Poster" class="rounded" style="width: 70px; height: 100px; object-fit: cover;">
+                        <img src="@Model.Session?.Movie?.ImageURL" alt="Poster" class="rounded" style="width: 70px; aspect-ratio: 2/3; object-fit: cover;">
                         <div>
                             <h5 class="fw-bold text-warning mb-1">@Model.Session?.Movie?.Title</h5>
                             <p class="mb-1 small text-white-50">@Model.Session?.StartTime.ToString("dd/MM/yyyy HH:mm")</p>
