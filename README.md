@@ -108,3 +108,5 @@ O sistema vem pre-populado com os seguintes perfis para facilitar os testes:
 ### Perfil Cliente Comum
 *   **E-mail:** cliente@cinemax.com
 *   **Senha:** 123456
+
+*   
