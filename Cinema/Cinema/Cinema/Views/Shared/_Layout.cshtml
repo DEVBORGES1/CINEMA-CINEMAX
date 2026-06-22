@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CineMax</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Cinema.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- no <head> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold fs-3" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-film me-2 text-warning"></i>CineMax
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Home" asp-action="AdminDashboard">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Ticket" asp-action="AllSales">Vendas</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home me-1"></i>Início
+                            </a>
+                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Person" asp-action="Index">
+                                    <i class="fas fa-user me-1"></i>Pessoas
+                                </a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Movie" asp-action="Index">
+                                <i class="fas fa-video me-1"></i>Filmes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Session" asp-action="Index">
+                                <i class="fas fa-clock me-1"></i>Sessões
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Ticket" asp-action="Index">
+                                <i class="fas fa-ticket-alt me-1"></i>Ingressos
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-concierge-bell me-1"></i>Serviços e Facilidades
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="servicesDropdown">
+                                <li>
+                                    <a class="dropdown-item services-dropdown-item" href="#" data-tab="tab-aluguel">
+                                        <i class="fas fa-video me-2 text-primary"></i>Aluguel de Salas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item services-dropdown-item" href="#" data-tab="tab-anuncie">
+                                        <i class="fas fa-bullhorn me-2 text-success"></i>Anuncie nas Telas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item services-dropdown-item" href="#" data-tab="tab-corporativo">
+                                        <i class="fas fa-id-card me-2 text-info"></i>Ingresso Corporativo
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item services-dropdown-item" href="#" data-tab="tab-escola">
+                                        <i class="fas fa-school me-2 text-warning"></i>Sessão Escola
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        @if (User.Identity!.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-1"></i>Olá, @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Ticket" asp-action="MyTickets">
+                                            <i class="fas fa-ticket-alt me-2"></i>Meus Ingressos
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline w-100">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="fas fa-sign-out-alt me-2"></i>Sair
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item me-2">
+                                <a class="btn btn-outline-light btn-sm px-3 rounded-pill" asp-controller="Auth" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-warning btn-sm px-3 rounded-pill text-dark fw-bold" asp-controller="Auth" asp-action="Register">
+                                    <i class="fas fa-user-plus me-1"></i>Criar Conta
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main style="margin-top: 3.5em;">
+        @RenderBody()
+    </main>
+
+    <footer class="footer mt-auto py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-film me-2 text-warning"></i>CineMax</h5>
+                    <p class="mb-0">A melhor experiência cinematográfica da cidade.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2025 - CineMax - Todos os direitos reservados</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Services & Facilities Modal -->
+    <div class="modal fade" id="servicesModal" tabindex="-1" aria-labelledby="servicesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-dark border border-secondary text-white shadow-lg">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title fw-bold" id="servicesModalLabel">
+                        <i class="fas fa-concierge-bell text-warning me-2"></i>Serviços e Facilidades
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <!-- Left vertical navigation menu -->
+                        <div class="col-md-4 mb-3 mb-md-0 border-end border-secondary">
+                            <div class="nav flex-column nav-pills" id="servicesModalTabs" role="tablist" aria-orientation="vertical">
+                                <button class="nav-link active text-start fw-bold mb-2 p-3 text-white" id="tab-aluguel-btn" data-bs-toggle="pill" data-bs-target="#tab-aluguel" type="button" role="tab" aria-controls="tab-aluguel" aria-selected="true">
+                                    <i class="fas fa-video me-2 text-primary"></i>Aluguel de Salas
+                                </button>
+                                <button class="nav-link text-start fw-bold mb-2 p-3 text-white" id="tab-anuncie-btn" data-bs-toggle="pill" data-bs-target="#tab-anuncie" type="button" role="tab" aria-controls="tab-anuncie" aria-selected="false">
+                                    <i class="fas fa-bullhorn me-2 text-success"></i>Anuncie nas Telas
+                                </button>
+                                <button class="nav-link text-start fw-bold mb-2 p-3 text-white" id="tab-corporativo-btn" data-bs-toggle="pill" data-bs-target="#tab-corporativo" type="button" role="tab" aria-controls="tab-corporativo" aria-selected="false">
+                                    <i class="fas fa-id-card me-2 text-info"></i>Ingresso Corporativo
+                                </button>
+                                <button class="nav-link text-start fw-bold p-3 text-white" id="tab-escola-btn" data-bs-toggle="pill" data-bs-target="#tab-escola" type="button" role="tab" aria-controls="tab-escola" aria-selected="false">
+                                    <i class="fas fa-school me-2 text-warning"></i>Sessão Escola
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Right tab content -->
+                        <div class="col-md-8">
+                            <div class="tab-content ps-md-3" id="servicesModalTabContent">
+                                <!-- Aluguel de Salas Content -->
+                                <div class="tab-pane fade show active" id="tab-aluguel" role="tabpanel" aria-labelledby="tab-aluguel-btn">
+                                    <h4 class="fw-bold text-primary mb-3">Aluguel de Salas</h4>
+                                    <p class="text-white-50">Transforme seu evento em uma experiência inesquecível. Alugue nossas salas de cinema para aniversários, reuniões corporativas, palestras ou sessões exclusivas de lançamentos para sua empresa ou escola.</p>
+                                    <h6 class="fw-bold text-white mt-4 mb-2"><i class="fas fa-check-circle text-primary me-2"></i>Destaques do Serviço:</h6>
+                                    <ul class="text-white-50 ps-3">
+                                        <li class="mb-1">Capacidade de 40 a 80 poltronas altamente confortáveis.</li>
+                                        <li class="mb-1">Projeção digital a laser de altíssima definição (4K).</li>
+                                        <li class="mb-1">Som surround Dolby Atmos para o máximo impacto.</li>
+                                        <li class="mb-1">Opção de pacotes personalizados de combos do Snack Bar.</li>
+                                    </ul>
+                                    <div class="mt-4">
+                                        <button class="btn btn-primary rounded-pill w-100" data-bs-dismiss="modal">Solicitar Orçamento</button>
+                                    </div>
+                                </div>
+                                <!-- Anuncie nas Telas Content -->
+                                <div class="tab-pane fade" id="tab-anuncie" role="tabpanel" aria-labelledby="tab-anuncie-btn">
+                                    <h4 class="fw-bold text-success mb-3">Anuncie nas Telas</h4>
+                                    <p class="text-white-50">Sua marca na maior tela da cidade! Exiba seu vídeo comercial no período pré-show de todas as nossas sessões públicas e capture a atenção total de milhares de espectadores mensalmente.</p>
+                                    <h6 class="fw-bold text-white mt-4 mb-2"><i class="fas fa-check-circle text-success me-2"></i>Destaques do Serviço:</h6>
+                                    <ul class="text-white-50 ps-3">
+                                        <li class="mb-1">Inserções comerciais de 15 a 30 segundos antes dos trailers.</li>
+                                        <li class="mb-1">Público focado e engajado, livre de distrações.</li>
+                                        <li class="mb-1">Exibição de mídia estática nos painéis digitais do hall.</li>
+                                        <li class="mb-1">Relatório mensal de público e sessões rodadas.</li>
+                                    </ul>
+                                    <div class="mt-4">
+                                        <button class="btn btn-success rounded-pill w-100" data-bs-dismiss="modal">Baixar Mídia Kit</button>
+                                    </div>
+                                </div>
+                                <!-- Ingresso Corporativo Content -->
+                                <div class="tab-pane fade" id="tab-corporativo" role="tabpanel" aria-labelledby="tab-corporativo-btn">
+                                    <h4 class="fw-bold text-info mb-3">Ingresso Corporativo</h4>
+                                    <p class="text-white-50">Premie seus funcionários ou presenteie seus clientes fiéis com a magia do cinema. Adquira pacotes de ingressos corporativos com tarifas promocionais exclusivas.</p>
+                                    <h6 class="fw-bold text-white mt-4 mb-2"><i class="fas fa-check-circle text-info me-2"></i>Destaques do Serviço:</h6>
+                                    <ul class="text-white-50 ps-3">
+                                        <li class="mb-1">Lotes mínimos reduzidos e descontos progressivos por volume.</li>
+                                        <li class="mb-1">Ingressos com validade estendida de até 6 meses.</li>
+                                        <li class="mb-1">Opção de vouchers eletrônicos fáceis de distribuir e resgatar.</li>
+                                        <li class="mb-1">Válidos para qualquer filme, dia e horário.</li>
+                                    </ul>
+                                    <div class="mt-4">
+                                        <button class="btn btn-info text-dark rounded-pill w-100 fw-bold" data-bs-dismiss="modal">Falar com Consultor</button>
+                                    </div>
+                                </div>
+                                <!-- Sessão Escola Content -->
+                                <div class="tab-pane fade" id="tab-escola" role="tabpanel" aria-labelledby="tab-escola-btn">
+                                    <h4 class="fw-bold text-warning mb-3">Sessão Escola</h4>
+                                    <p class="text-white-50">Traga seus alunos para uma aula diferente! Oferecemos sessões especiais exclusivas para turmas escolares com preços de ingresso e combos de pipoca super reduzidos.</p>
+                                    <h6 class="fw-bold text-white mt-4 mb-2"><i class="fas fa-check-circle text-warning me-2"></i>Destaques do Serviço:</h6>
+                                    <ul class="text-white-50 ps-3">
+                                        <li class="mb-1">Tarifa super reduzida (meia-entrada social) para todos os alunos.</li>
+                                        <li class="mb-1">Isenção para professores e acompanhantes responsáveis.</li>
+                                        <li class="mb-1">Horários flexíveis pela manhã ou início da tarde.</li>
+                                        <li class="mb-1">Possibilidade de exibir documentários ou filmes educativos sob demanda.</li>
+                                    </ul>
+                                    <div class="mt-4">
+                                        <button class="btn btn-warning rounded-pill w-100 text-dark fw-bold" data-bs-dismiss="modal">Solicitar Agendamento</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- antes de fechar o body (após o bootstrap.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdownItems = document.querySelectorAll('.services-dropdown-item');
+            
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const tabTargetId = this.getAttribute('data-tab');
+                    
+                    // Inicializar e exibir o modal usando Bootstrap
+                    const modalEl = document.getElementById('servicesModal');
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                    
+                    // Encontrar o botão da tab correspondente no modal e acionar o clique nele
+                    const tabBtn = document.querySelector(`#servicesModalTabs button[data-bs-target="#${tabTargetId}"]`);
+                    if (tabBtn) {
+                        const tab = bootstrap.Tab.getOrCreateInstance(tabBtn);
+                        tab.show();
+                    }
+                });
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

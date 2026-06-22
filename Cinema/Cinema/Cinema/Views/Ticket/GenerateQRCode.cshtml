@@ -1,0 +1,401 @@
+@model Cinema.Models.Ticket
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Ingresso Digital - " + Model.ID;
+}
+
+<div class="container py-5 d-flex flex-column align-items-center justify-content-center min-vh-100 position-relative" style="overflow: hidden;">
+    <!-- Background Cinematic Blur -->
+    @if (!string.IsNullOrEmpty(Model.Session?.Movie?.ImageURL))
+    {
+        <div class="cinematic-bg" style="background-image: url('@Model.Session.Movie.ImageURL');"></div>
+    }
+    else
+    {
+        <div class="cinematic-bg" style="background: linear-gradient(135deg, #111 0%, #222 100%);"></div>
+    }
+
+    <!-- Outer Card containing the ticket -->
+    <div class="ticket-wrapper animated-fade-in">
+        <div class="ticket-card-3d">
+            <!-- TICKET TOP: Movie & Session Info -->
+            <div class="ticket-top">
+                <div class="ticket-glow"></div>
+                <div class="d-flex align-items-start gap-4">
+                    <!-- Mini Poster -->
+                    <div class="ticket-poster d-none d-sm-block">
+                        @if (!string.IsNullOrEmpty(Model.Session?.Movie?.ImageURL))
+                        {
+                            <img src="@Model.Session.Movie.ImageURL" alt="Poster de @Model.Session.Movie.Title" />
+                        }
+                        else
+                        {
+                            <div class="poster-fallback"><i class="fas fa-film fa-2x text-white-50"></i></div>
+                        }
+                    </div>
+                    
+                    <!-- Text Details -->
+                    <div class="flex-grow-1">
+                        <span class="badge bg-warning text-dark fw-bold mb-2 text-uppercase tracking-wider">CineMax Ingresso</span>
+                        <h2 class="movie-title mb-2">@(Model.Session?.Movie?.Title ?? "Título indisponível")</h2>
+                        
+                        <div class="d-flex flex-wrap gap-2 align-items-center small text-white-50 mb-3">
+                            <span><i class="fas fa-clock me-1"></i>@(Model.Session?.Movie?.DurationInMinutes ?? 0) min</span>
+                            <span>•</span>
+                            <span class="badge border border-secondary text-white">@(Model.Session?.Movie?.AgeRating?.Rating ?? "Livre")</span>
+                            <span>•</span>
+                            <span class="movie-genres">
+                                @(Model.Session?.Movie?.Genres != null ? string.Join(", ", Model.Session.Movie.Genres.Select(g => g.Name)) : "Gênero não informado")
+                            </span>
+                        </div>
+
+                        <div class="row g-2 mt-2">
+                            <div class="col-6">
+                                <small class="info-label">SALA</small>
+                                <div class="info-value font-highlight text-warning">@(Model.Session?.Room?.RoomNumber ?? 0)</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="info-label">ASSENTO</small>
+                                <div class="info-value font-highlight text-white">@Model.SeatRow@Model.SeatNumber</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TICKET DIVIDER: Perforated/Dashed with Circle Cutouts -->
+            <div class="ticket-divider">
+                <div class="circle-cutout-left"></div>
+                <div class="dashed-line"></div>
+                <div class="circle-cutout-right"></div>
+            </div>
+
+            <!-- TICKET BOTTOM: QR Code & Stub Details -->
+            <div class="ticket-bottom">
+                <div class="row g-4 align-items-center">
+                    <!-- Left: Details -->
+                    <div class="col-md-7 text-start">
+                        <div class="row g-3 mb-3">
+                            <div class="col-6 col-sm-4">
+                                <small class="info-label">DATA</small>
+                                <div class="info-value-sm">@Model.Session?.StartTime.ToString("dd/MM/yyyy")</div>
+                            </div>
+                            <div class="col-6 col-sm-4">
+                                <small class="info-label">HORÁRIO</small>
+                                <div class="info-value-sm">@Model.Session?.StartTime.ToString("HH:mm")</div>
+                            </div>
+                            <div class="col-12 col-sm-4">
+                                <small class="info-label">PREÇO</small>
+                                <div class="info-value-sm text-success fw-bold">@((Model.Price ?? 0m).ToString("C2", CultureInfo.GetCultureInfo("pt-BR")))</div>
+                            </div>
+                        </div>
+
+                        <div class="border-top border-secondary pt-3 mt-3">
+                            <p class="mb-1 text-white-50 small">
+                                <i class="fas fa-user me-1"></i> 
+                                <strong>Cliente:</strong> @(Model.Person != null ? $"{Model.Person.FirstName} {Model.Person.LastName}" : "Consumidor")
+                            </p>
+                            <p class="mb-1 text-white-50 small">
+                                <i class="fas fa-receipt me-1"></i> 
+                                <strong>Ingresso Nº:</strong> #@Model.ID
+                            </p>
+                            <p class="mb-0 text-white-50 small">
+                                <i class="fas fa-calendar-alt me-1"></i> 
+                                <strong>Comprado em:</strong> @Model.PurchaseDate.ToString("dd/MM/yyyy HH:mm")
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right: QR Code Container -->
+                    <div class="col-md-5 d-flex flex-column align-items-center justify-content-center border-start-md border-secondary-dashed py-2">
+                        <div class="qrcode-container mb-2 p-2">
+                            <img src="@Url.Action("QrCode", "Ticket", new { id = Model.ID, pixelsPerModule = 6 })" alt="QR Code do Ingresso" />
+                        </div>
+                        <span class="text-uppercase tracking-wider small text-white-50 font-monospace">Apresentar na Entrada</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Bar Below Ticket -->
+    <div class="d-flex gap-3 mt-4 no-print position-relative z-index-10">
+        <a asp-action="MyTickets" class="btn btn-outline-light btn-lg px-4 rounded-pill transition-all">
+            <i class="fas fa-arrow-left me-2"></i>Meus Ingressos
+        </a>
+        <button onclick="window.print()" class="btn btn-warning btn-lg px-4 rounded-pill transition-all text-dark fw-bold">
+            <i class="fas fa-print me-2"></i>Imprimir Ingresso
+        </button>
+    </div>
+</div>
+
+<style>
+    /* Cinematic Blurred Background */
+    .cinematic-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-size: cover;
+        background-position: center;
+        filter: blur(25px) brightness(0.2);
+        z-index: 1;
+        transform: scale(1.1);
+    }
+
+    .z-index-10 {
+        z-index: 10;
+    }
+
+    /* Ticket Container Animations */
+    .animated-fade-in {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Ticket Card Wrappers & Styling */
+    .ticket-wrapper {
+        position: relative;
+        z-index: 5;
+        width: 100%;
+        max-width: 600px;
+        perspective: 1000px;
+    }
+
+    .ticket-card-3d {
+        background: rgba(26, 26, 26, 0.45);
+        backdrop-filter: blur(12px) saturate(160%);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 193, 7, 0.05);
+        overflow: hidden;
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s;
+    }
+
+    .ticket-card-3d:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.6), 0 0 60px rgba(255, 193, 7, 0.1);
+    }
+
+    /* Top Section */
+    .ticket-top {
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ticket-glow {
+        position: absolute;
+        top: -150px;
+        right: -150px;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 193, 7, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ticket-poster {
+        width: 110px;
+        height: auto;
+        aspect-ratio: 2/3;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .ticket-poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .poster-fallback {
+        width: 100%;
+        height: 100%;
+        background: #2a2a2a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .movie-title {
+        font-weight: 800;
+        font-size: 1.8rem;
+        color: #fff;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+    }
+
+    .tracking-wider {
+        letter-spacing: 2px;
+    }
+
+    /* Perforated Divider Styling */
+    .ticket-divider {
+        position: relative;
+        height: 24px;
+        display: flex;
+        align-items: center;
+    }
+
+    .circle-cutout-left,
+    .circle-cutout-right {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background: #141414; /* Match the layout dark background */
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        z-index: 10;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .circle-cutout-left {
+        left: -12px;
+    }
+
+    .circle-cutout-right {
+        right: -12px;
+    }
+
+    .dashed-line {
+        width: 100%;
+        height: 0;
+        border-top: 2px dashed rgba(255, 255, 255, 0.15);
+        margin: 0 12px;
+    }
+
+    /* Bottom Section */
+    .ticket-bottom {
+        padding: 30px;
+        background: rgba(0, 0, 0, 0.15);
+    }
+
+    .info-label {
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 700;
+        font-size: 0.7rem;
+        letter-spacing: 1.5px;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .info-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+
+    .info-value-sm {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .font-highlight {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* QR Code Container Styling */
+    .qrcode-container {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        display: inline-block;
+        transition: transform 0.3s;
+    }
+
+    .qrcode-container:hover {
+        transform: scale(1.03);
+    }
+
+    .qrcode-container img {
+        display: block;
+        width: 130px;
+        height: 130px;
+    }
+
+    .border-secondary-dashed {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Medium screens and up */
+    @@media (min-width: 768px) {
+        .border-start-md {
+            border-left: 1px dashed rgba(255, 255, 255, 0.15) !important;
+        }
+    }
+
+    /* Print Styles */
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+        main, main * {
+            visibility: hidden;
+        }
+        header, footer, .no-print, .navbar {
+            display: none !important;
+        }
+        /* Make ticket wrapper visible */
+        .container, .ticket-wrapper, .ticket-wrapper * {
+            visibility: visible;
+        }
+        .container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+        .ticket-card-3d {
+            background: #fff !important;
+            color: #000 !important;
+            border: 2px solid #000 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        .movie-title, .info-value-sm, .font-highlight, p.text-white-50 {
+            color: #000 !important;
+        }
+        .info-label {
+            color: #555 !important;
+        }
+        .circle-cutout-left, .circle-cutout-right {
+            background: #fff !important;
+            border-color: #000 !important;
+        }
+        .dashed-line {
+            border-top: 2px dashed #000 !important;
+        }
+        .cinematic-bg {
+            display: none !important;
+        }
+    }
+
+    .transition-all {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .btn-outline-light:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: #fff;
+    }
+</style>

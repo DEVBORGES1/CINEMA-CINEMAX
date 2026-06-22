@@ -1,0 +1,157 @@
+@model Cinema.Models.Movie
+@{
+    ViewData["Title"] = "Detalhes do Filme";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="fw-bold mb-4">
+                        <i class="fas fa-film text-warning me-2"></i>
+                        @Model?.Title
+                    </h2>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <img src="@Model?.ImageURL"
+                                 alt="@Model?.Title"
+                                 asp-append-version="true"
+                                 class="movie-cover d-block mx-auto mb-3 img-fluid" />
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">
+                                        <i class="fas fa-clock me-1"></i>
+                                        Duração
+                                    </h6>
+                                    <p class="text-muted">@Model?.DurationInMinutes minutos</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">
+                                        <i class="fas fa-user-shield me-1"></i>
+                                        Classificação Indicativa
+                                    </h6>
+                                    <p class="text-muted">@Model?.AgeRating?.Rating</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-tags me-1"></i>
+                                    Gêneros
+                                </h6>
+                                @if (Model?.Genres != null && Model.Genres.Any())
+                                {
+                                    <div>
+                                        @foreach (var genre in Model.Genres)
+                                        {
+                                            <span class="badge bg-warning text-dark me-1 mb-1">@genre.Name</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">—</p>
+                                }
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">
+                                        <i class="fas fa-users me-1"></i>
+                                        Atores
+                                    </h6>
+                                    @{
+                                        var actorsText = (Model?.Actors != null && Model.Actors.Any())
+                                            ? string.Join(", ", Model.Actors.Select(a => $"{(a.FirstName ?? "")} {(a.LastName ?? "")}".Trim()))
+                                            : "—";
+                                    }
+                                    <p class="text-muted">@actorsText</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <h6 class="fw-bold">
+                                        <i class="fas fa-user-tie me-1"></i>
+                                        Diretores
+                                    </h6>
+                                    @{
+                                        var directorsText = (Model?.Directors != null && Model.Directors.Any())
+                                            ? string.Join(", ", Model.Directors.Select(d => $"{(d.FirstName ?? "")} {(d.LastName ?? "")}".Trim()))
+                                            : "—";
+                                    }
+                                    <p class="text-muted">@directorsText</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-align-left me-1"></i>
+                                    Sinopse
+                                </h6>
+                                <p class="text-muted">@Model?.Synopsis</p>
+                            </div>
+
+                            <!-- Sessões Disponíveis -->
+                            <div class="mt-4 pt-3 border-top border-secondary">
+                                <h5 class="fw-bold mb-3 text-warning">
+                                    <i class="fas fa-clock me-2"></i>Sessões Disponíveis
+                                </h5>
+                                @{
+                                    var sessions = ViewBag.Sessions as List<Cinema.Models.Session>;
+                                }
+                                @if (sessions != null && sessions.Any())
+                                {
+                                    <div class="row g-3">
+                                        @foreach (var session in sessions)
+                                        {
+                                            <div class="col-md-6 col-lg-4">
+                                                <div class="card bg-dark border border-secondary rounded p-3 h-100 d-flex flex-column justify-content-between">
+                                                    <div>
+                                                        <div class="d-flex justify-content-between mb-2">
+                                                            <span class="badge bg-secondary">Sala @session.Room?.RoomNumber</span>
+                                                            <span class="text-warning fw-bold">R$ @session.Price.ToString("F2")</span>
+                                                        </div>
+                                                        <h6 class="text-white fw-bold mb-1">
+                                                            <i class="far fa-calendar-alt me-1"></i>
+                                                            @session.StartTime.ToString("dd/MM/yyyy")
+                                                        </h6>
+                                                        <p class="text-muted small mb-3">
+                                                            <i class="far fa-clock me-1"></i>
+                                                            @session.StartTime.ToString("HH:mm") - @session.EndTime.ToString("HH:mm")
+                                                        </p>
+                                                    </div>
+                                                    <a asp-controller="Checkout" asp-action="Index" asp-route-sessionId="@session.ID" class="btn btn-warning w-100 fw-bold rounded-pill">
+                                                        <i class="fas fa-ticket-alt me-2"></i>Comprar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-secondary bg-dark text-white border-secondary">
+                                        <i class="fas fa-info-circle me-2"></i>Não há sessões agendadas para este filme no momento.
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <a asp-action="Index" class="btn btn-outline-warning">
+                                <i class="fas fa-arrow-left me-1"></i> Voltar para Filmes
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

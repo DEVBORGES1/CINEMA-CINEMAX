@@ -1,0 +1,132 @@
+@model IEnumerable<Cinema.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Meus Ingressos";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-4 fw-bold">
+                <i class="fas fa-ticket-alt text-warning me-3"></i>Meus Ingressos
+            </h1>
+            <p class="text-muted lead">Histórico de compras e ingressos ativos.</p>
+        </div>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-light">
+            <i class="fas fa-plus me-2"></i>Comprar Mais
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+        @foreach (var ticket in Model)
+        {
+            <!-- Lógica para definir se sessão já passou (ex: desabilitar ou mudar cor) -->
+            bool isPast = ticket.Session != null && ticket.Session.StartTime < DateTime.Now;
+            string opacityClass = isPast ? "opacity-75 grayscale" : "";
+            
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="ticket-card card h-100 @opacityClass border-0 shadow-lg">
+                    <!-- Cabeçalho com Capa do Filme (se tiver) ou gradiente -->
+                    <div class="card-header border-0 p-0 position-relative" style="height: 100px; overflow: hidden;">
+                        @if (!string.IsNullOrEmpty(ticket.Session?.Movie?.ImageURL))
+                        {
+                            <div style="background-image: url('@ticket.Session.Movie.ImageURL'); background-size: cover; background-position: center; filter: blur(4px); position: absolute; top:0; left:0; right:0; bottom:0;"></div>
+                            <div style="background: rgba(0,0,0,0.6); position: absolute; top:0; left:0; right:0; bottom:0;"></div>
+                        }
+                        else
+                        {
+                             <div class="bg-primary h-100 w-100" style="background: linear-gradient(45deg, var(--primary-color), #000);"></div>
+                        }
+                        
+                        <div class="position-absolute top-50 start-50 translate-middle text-center w-100">
+                            <h5 class="text-white text-shadow fw-bold mb-0">@ticket.Session?.Movie?.Title</h5>
+                        </div>
+                    </div>
+
+                    <div class="card-body position-relative">
+                        <!-- Perforated Line Effect (CSS trick or border) -->
+                        <div style="border-bottom: 2px dashed #444; margin-bottom: 1rem;"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <small class="text-muted d-block uppercase">Data</small>
+                                <span class="fw-bold fs-5">@ticket.Session?.StartTime.ToString("dd/MM")</span>
+                            </div>
+                             <div class="col-6 text-end">
+                                <small class="text-muted d-block uppercase">Horário</small>
+                                <span class="fw-bold fs-5">@ticket.Session?.StartTime.ToString("HH:mm")</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-2 rounded bg-dark">
+                             <div>
+                                <small class="text-muted d-block">Sala</small>
+                                <span class="fw-bold fs-4 text-warning">@ticket.Session?.Room?.RoomNumber</span>
+                            </div>
+                             <div class="text-end">
+                                <small class="text-muted d-block">Assento</small>
+                                <span class="fw-bold fs-4 text-white">@ticket.SeatRow@ticket.SeatNumber</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="text-center mt-3">
+                             <a asp-action="GenerateQRCode" asp-route-id="@ticket.ID" target="_blank" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-qrcode me-1"></i> Ver QR Code
+                            </a>
+                        </div>
+
+                    </div>
+                    
+                    @if (isPast)
+                    {
+                        <div class="card-footer bg-secondary text-white text-center py-1">
+                            <small>Sessão Encerrada</small>
+                        </div>
+                    }
+                    else
+                    {
+                         <div class="card-footer bg-success text-white text-center py-1">
+                            <small>Sessão Ativa</small>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        }
+        </div>
+    }
+    else
+    {
+         <div class="text-center py-5">
+            <div class="mb-4">
+                 <i class="fas fa-ticket-alt fa-4x text-muted opacity-25"></i>
+            </div>
+            <h3 class="text-muted">Você ainda não tem ingressos.</h3>
+            <p class="mb-4 text-muted">Escolha um filme e garanta seu lugar!</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4 py-2">
+                Ver Programação
+            </a>
+        </div>
+    }
+</div>
+
+<style>
+    .grayscale {
+        filter: grayscale(100%);
+        transition: filter 0.3s;
+    }
+    .grayscale:hover {
+        filter: grayscale(0%);
+    }
+    .uppercase {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+</style>
